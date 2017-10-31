@@ -312,7 +312,7 @@ set rtp+=/usr/local/opt/fzf
 set rtp+=~/.fzf
 let g:ackprg = 'ag --vimgrep'
 
-map <C-f> :Ag<CR>
+map <C-f> :Ag!<space>
 map <C-t>b :Buffers<cr>
 map <C-t>f :FZF<cr>
 map <C-t>h :History<cr>
