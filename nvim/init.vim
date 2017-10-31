@@ -373,12 +373,6 @@ let g:tagbar_show_linenumbers = 1
 map <C-m> :TagbarToggle<CR>
 
 " --------------------------------------------------
-"  NERDTree (might remove this soon)
-" --------------------------------------------------
-call minpac#add('scrooloose/nerdtree')
-map <silent> <Leader>n :NERDTreeToggle<CR>
-
-" --------------------------------------------------
 " Colours and Fonts
 " --------------------------------------------------
 call minpac#add('chriskempson/base16-vim')
