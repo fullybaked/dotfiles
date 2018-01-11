@@ -293,7 +293,6 @@ call minpac#add('tpope/vim-rails')
 " Inline ruby execution using #=>
 call minpac#add('t9md/vim-ruby-xmpfilter')
 " Better block level motions in Ruby
-call minpac#add('kana/vim-textobj-user')
 call minpac#add('nelstrom/vim-textobj-rubyblock')
 
 " Enable compiler support for ruby
