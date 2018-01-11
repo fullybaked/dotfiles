@@ -2,3 +2,4 @@ backups/*
 elpa/*
 auto-save-list/*
 .DS_Store
+.ruby-version
