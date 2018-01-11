@@ -250,6 +250,17 @@ let g:test#preserve_screen = 1
 nnoremap <silent> <Leader>tf :Topen <bar> TestFile<cr>
 nnoremap <silent> <Leader>tn :Topen <bar> TestNearest<cr>
 nnoremap <silent> <Leader>ts :Topen <bar> TestSuite<cr>
+
+" --------------------------------------------------
+" Better text objects
+" --------------------------------------------------
+call minpac#add('kana/vim-textobj-user')
+call minpac#add('lucapette/vim-textobj-underscore')
+call minpac#add('jceb/vim-textobj-uri')
+call minpac#add('kana/vim-textobj-indent')
+call minpac#add('kana/vim-textobj-line')
+call minpac#add('wellle/targets.vim')
+
 " --------------------------------------------------
 "  Langauges
 " --------------------------------------------------
