@@ -247,6 +247,9 @@ call minpac#add('janko-m/vim-test')
 let g:test#strategy='neoterm'
 let g:test#preserve_screen = 1
 
+nnoremap <silent> <Leader>tf :Topen <bar> TestFile<cr>
+nnoremap <silent> <Leader>tn :Topen <bar> TestNearest<cr>
+nnoremap <silent> <Leader>ts :Topen <bar> TestSuite<cr>
 " --------------------------------------------------
 "  Langauges
 " --------------------------------------------------
