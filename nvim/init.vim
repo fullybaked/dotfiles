@@ -316,6 +316,21 @@ autocmd FileType ruby imap <buffer> <Leader>R <Plug>(xmpfilter-run)
 "
 call minpac#add('junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' })
 call minpac#add('junegunn/fzf.vim')
+
+
+" --------------------------------------------------
+" Rails route completion with FZF
+" https://blog.semanticart.com/2017/11/14/rails-route-completion-with-fzf-in-vim
+" --------------------------------------------------
+function! s:parse_route(selected)
+  let l:squished = substitute(join(a:selected), '^\s\+', '', '')
+  return split(l:squished)[0] . '_path'
+endfunction
+
+inoremap <expr> <C-x><C-r> fzf#complete({
+  \ 'source': 'rake routes',
+  \ 'reducer': '<sid>parse_route'})
+
 " use ack.vim for Silver searcher as ag.vim is deprecated
 call minpac#add('mileszs/ack.vim')
 
