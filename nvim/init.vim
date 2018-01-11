@@ -268,12 +268,12 @@ call minpac#add('mattn/emmet-vim')
 call minpac#add('kchmck/vim-coffee-script')
 call minpac#add('elixir-editors/vim-elixir')
 
-autocmd FileType text :set nospell
 autocmd FileType text setlocal textwidth=72
 autocmd FileType text setlocal nosi
-autocmd FileType text :set spl=en_us spell
 
-autocmd FileType html :set spl=en_us spell
+autocmd FileType text :set spl=en_gb spell
+autocmd FileType html :set spl=en_gb spell
+autocmd FileType markdown :set spl=en_gb spell
 
 " --------------------------------------------------
 "  PHP
