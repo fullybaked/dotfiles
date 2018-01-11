@@ -228,6 +228,7 @@ call minpac#add('raimondi/delimitmate')             " Auto close quote, parens, 
 call minpac#add('christoomey/vim-tmux-navigator')   " Better nav with tmux see https://github.com/christoomey/vim-tmux-navigator
 call minpac#add('tpope/vim-commentary')             " Easy line commenting
 call minpac#add('sheerun/vim-polyglot')             " Better syntax highlighting support
+call minpac#add('vim-scripts/ReplaceWithRegister')  " Enable gr command to replace motion/object with current anonymous register
 
 call minpac#add('tpope/vim-vinegar')                " Better netrw for directory stuff
 let g:netrw_liststyle = 1 " Detail View
