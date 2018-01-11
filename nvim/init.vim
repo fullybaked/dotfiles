@@ -21,9 +21,6 @@ let mapleader = ","
 
 " easier escaping from home row
 inoremap <silent> jj <Esc>
-inoremap <silent> kk <Esc>
-inoremap <silent> jk <Esc>
-inoremap <silent> kj <Esc>
 
 " turn off linewise keys, always move up/down one line even if wrapped
 nnoremap <silent> j gj
