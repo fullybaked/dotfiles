@@ -17,10 +17,14 @@
 " --------------------------------------------------
 " KEY MAPS
 " --------------------------------------------------
-let mapleader = ","
+"  Leader must be set before any leader mappings as it is bound at runtime
+let mapleader = "\<Space>"
 
 " easier escaping from home row
 inoremap <silent> jj <Esc>
+
+" bounce between two buffers
+nnoremap <leader><leader> <c-^>
 
 " turn off linewise keys, always move up/down one line even if wrapped
 nnoremap <silent> j gj
@@ -29,15 +33,57 @@ nnoremap <silent> k gk
 " make Y act like D and C, yank to end of current line
 nnoremap <silent> Y y$
 
-" use the space key to toggle folds
-nnoremap <space> za
-vnoremap <space> zf
+"Enable indent folding
+set foldenable
+set foldmethod=indent
+set foldlevel=999
+
+" So I never use s, and I want a single key map to toggle folds, thus
+" lower s = toggle <=> upper S = toggle recursive
+nnoremap <leader>ff za
+nnoremap <leader>FF zA
+
+"Maps for folding, unfolding all
+nnoremap <leader>fu zM<CR>
+nnoremap <leader>uf zR<CR>
+
+" This will run the macro in q register
+nnoremap Q @q
+
+" Swap 0 and ^. I tend to want to jump to the first non-whitespace character
+" so make that the easier one to do.
+nnoremap 0 ^
+nnoremap ^ 0
+
+" Use C-Space to Esc out of any mode
+nnoremap <C-Space> <Esc>:noh<CR>
+vnoremap <C-Space> <Esc>gV
+onoremap <C-Space> <Esc>
+cnoremap <C-Space> <C-c>
+inoremap <C-Space> <Esc>
+" Terminal sees <C-@> as <C-space>
+nnoremap <C-@> <Esc>:noh<CR>
+vnoremap <C-@> <Esc>gV
+onoremap <C-@> <Esc>
+cnoremap <C-@> <C-c>
+inoremap <C-@> <Esc>
 
 " super fast window movement shortcuts
 nmap <C-j> <C-W>j
 nmap <C-k> <C-W>k
 nmap <C-h> <C-W>h
 nmap <C-l> <C-W>l
+
+" Resize windows so current is biggest
+set winwidth=100
+" We have to have a winheight bigger than we want to set winminheight. But if
+" we set winheight to be huge before winminheight, the winminheight set will
+" fail.
+set winheight=6
+set winminheight=6
+set winheight=999
+" automatically rebalance windows on vim resize
+"autocmd VimResized * :wincmd =
 
 " Short cut to splits (\ is the | without a shift)
 nnoremap <silent> <Leader>\ :vsp<cr>
@@ -53,8 +99,8 @@ nnoremap <C-Right> <C-w>>
 nnoremap <C-Up> <C-w>+
 nnoremap <C-Down> <C-w>-
 
-" automatically rebalance windows on vim resize
-autocmd VimResized * :wincmd =
+" quickly open a scratch file in current dir
+nnoremap <silent> <Leader>q :enew<cr>
 
 " clean trailing whitespace
 nnoremap <silent> <Leader>c :%s/\s\+$//e<cr>
@@ -65,14 +111,13 @@ nnoremap <silent> <Leader>h :nohl<cr>
 " quick newline in normal mode
 nnoremap <silent> <Leader><Enter> o<ESC>
 
-" quick new buffer
-nnoremap <silent> <Leader>q :enew<cr>
-
 " open current dir in netrw
-nnoremap <silent> <C-e> :Explore!<cr>
+nnoremap <silent> <C-y> :Explore!<cr>
+" noop the dash button to stop me fat-fingering it and dropping into netrw
+nmap - <Nop>
 
 " open my vimrc
-nnoremap <silent> <Leader>vi :vs $MYVIMRC<cr>
+nnoremap <silent> <Leader>i :vs $MYVIMRC<cr>
 
 " turn wrap on/off
 nnoremap <silent> <Leader>W :set wrap<cr>
@@ -98,6 +143,9 @@ cnoremap <C-g>  <C-c>
 cnoremap <C-p>  <Up>
 cnoremap <C-n>  <Down>
 
+cnoremap %% <C-R>=expand('%:h').'/'<cr>
+map <leader>e :edit %%
+map <leader>v :view %%
 " --------------------------------------------------
 " OPTIONS
 " --------------------------------------------------
@@ -141,8 +189,8 @@ set listchars=tab:>.,trail:.,extends:#,nbsp:.
 " Defaults to on for vim anyway, but just in case
 set showcmd
 set nowrap
-set textwidth=99
-set colorcolumn=100
+set textwidth=119
+set colorcolumn=
 " Wrap at word
 set linebreak
 " Vertical and horizontal splits default to equal sizes when created
@@ -173,7 +221,8 @@ set laststatus=2
 " disable mouse (it interferes with my terminal selections)
 set mouse=
 set diffopt+=vertical
-
+" only 1 space after joining
+set nojoinspaces
 
 " --------------------------------------------------
 " Custom Commands
@@ -183,6 +232,7 @@ command! W w !sudo tee % >/dev/null
 
 " When vimrc is edited, reload it
 autocmd! bufwritepost .vimrc source ~/.vimrc
+autocmd! bufwritepost init.vim source ~/.config/nvim/init.vim
 
 " --------------------------------------------------
 " Clipboard
@@ -229,6 +279,10 @@ call minpac#add('christoomey/vim-tmux-navigator')   " Better nav with tmux see h
 call minpac#add('tpope/vim-commentary')             " Easy line commenting
 call minpac#add('sheerun/vim-polyglot')             " Better syntax highlighting support
 call minpac#add('vim-scripts/ReplaceWithRegister')  " Enable gr command to replace motion/object with current anonymous register
+call minpac#add('kana/vim-textobj-entire') " Text object for entire buffer with `ae`
+call minpac#add('kana/vim-textobj-indent') " Text object for indent level
+call minpac#add('kana/vim-textobj-line') " Text object for a line of text
+call minpac#add('christoomey/vim-sort-motion') " Sort motion bound to `gs` (sort values in <textobject>)
 
 call minpac#add('tpope/vim-vinegar')                " Better netrw for directory stuff
 let g:netrw_liststyle = 1 " Detail View
@@ -244,12 +298,19 @@ call minpac#add('rizzatti/dash.vim')
 nnoremap <silent> <Leader>d <Plug>DashSearch
 
 call minpac#add('janko-m/vim-test')
-let g:test#strategy='neoterm'
 let g:test#preserve_screen = 1
 
-nnoremap <silent> <Leader>tf :Topen <bar> TestFile<cr>
-nnoremap <silent> <Leader>tn :Topen <bar> TestNearest<cr>
-nnoremap <silent> <Leader>ts :Topen <bar> TestSuite<cr>
+" NeoTerm version
+" let g:test#strategy='neoterm'
+" nmap <silent> <Leader>tn :belowright Topen <bar> TestNearest<CR>
+" nmap <silent> <Leader>tf :belowright Topen <bar> TestFile<CR>
+" nmap <silent> <Leader>tl :belowright Topen <bar> TestLast<CR>
+
+" VimTmuxRunner version
+let g:test#strategy='vtr'
+nmap <silent> <Leader>n :TestNearest<CR>
+nmap <silent> <Leader>tf :TestFile<CR>
+nmap <silent> <Leader>l :TestLast<CR>
 
 " --------------------------------------------------
 " Better text objects
@@ -276,17 +337,6 @@ autocmd FileType html :set spl=en_gb spell
 autocmd FileType markdown :set spl=en_gb spell
 
 " --------------------------------------------------
-"  PHP
-" --------------------------------------------------
-call minpac#add('stanangeloff/php.vim')
-autocmd FileType php setlocal comments=s1:/*,mb:*,ex:*/,://,:#
-autocmd FileType php setlocal formatoptions+=cro
-autocmd FileType php setlocal expandtab sw=4 sts=4 ts=4
-autocmd FileType php :set foldmethod=syntax
-autocmd FileType php :set foldlevel=1
-let g:phpcomplete_index_composer_command='/usr/local/bin/composer'
-
-" --------------------------------------------------
 " Ruby and Rails
 " --------------------------------------------------
 call minpac#add('tpope/vim-rails')
@@ -294,6 +344,8 @@ call minpac#add('tpope/vim-rails')
 call minpac#add('t9md/vim-ruby-xmpfilter')
 " Better block level motions in Ruby
 call minpac#add('nelstrom/vim-textobj-rubyblock')
+" Jump to FactoryBot definitions
+call minpac#add('christoomey/vim-rfactory')
 
 " Enable compiler support for ruby
 compiler ruby
@@ -302,21 +354,31 @@ autocmd FileType ruby :set foldmethod=syntax
 autocmd FileType ruby :set foldlevel=1
 
 autocmd FileType ruby nmap <buffer> <Leader>r <Plug>(xmpfilter-mark)
-autocmd FileType ruby xmap <buffer> <Leader>r <Plug>(xmpfilter-mark)
-autocmd FileType ruby imap <buffer> <Leader>r <Plug>(xmpfilter-mark)
 autocmd FileType ruby nmap <buffer> <Leader>R <Plug>(xmpfilter-run)
-autocmd FileType ruby xmap <buffer> <Leader>R <Plug>(xmpfilter-run)
-autocmd FileType ruby imap <buffer> <Leader>R <Plug>(xmpfilter-run)
+
+" quick versions of the vim-rails helpers for the normal MVC
+nmap <Leader>m :Files app/models<cr>
+nmap <Leader>v :Files app/views<cr>
+nmap <Leader>c :Files app/controllers<cr>
+nmap <Leader>j :Files app/assets/javascripts<cr>
+nmap <Leader>s :Files app/assets/stylesheets<cr>
+" vsplit & jump to the test/class based on the current buffer content
+nmap <Leader>a :vs <bar> A<cr>
+" open FactoryBot definition in a vertical split
+nmap <Leader>f :RVfactory<cr>
+
+" --------------------------------------------------
+" HTML / CSS
+" --------------------------------------------------
+call minpac#add('etdev/vim-hexcolor')
+call minpac#add('tpope/vim-ragtag')
 
 " --------------------------------------------------
 "  FZF & Silver searcher
+"  Assumes FZF & Silver Searcher are installed (via Homebrew)
 " --------------------------------------------------
-"
-" assumes FZF & Silver Searcher are installed (via Homebrew)
-"
 call minpac#add('junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' })
 call minpac#add('junegunn/fzf.vim')
-
 
 " --------------------------------------------------
 " Rails route completion with FZF
@@ -338,11 +400,9 @@ set rtp+=/usr/local/opt/fzf
 set rtp+=~/.fzf
 let g:ackprg = 'ag --vimgrep'
 
-map <C-f> :Ag!<space>
-map <C-t>b :Buffers<cr>
-map <C-t>f :FZF<cr>
-map <C-t>h :History<cr>
-map <C-t>t :Tags<cr>
+map <C-s> :Ag!<space>
+map <C-f> :FZF<cr>
+map <C-t> :Tags<cr>
 
 " --------------------------------------------------
 "  Git
@@ -352,16 +412,9 @@ call minpac#add('tpope/vim-fugitive')
 call minpac#add('airblade/vim-gitgutter')
 
 nnoremap <silent> <Leader>gs :Gstatus<CR>
-nnoremap <silent> <Leader>gd :Gdiff<CR>
-nnoremap <silent> <Leader>gc :Gcommit<CR>
 nnoremap <silent> <Leader>gb :Gblame<CR>
-nnoremap <silent> <Leader>gl :Glog<CR>
 nnoremap <silent> <Leader>gp :Git push<CR>
-nnoremap <silent> <Leader>gr :Gread<CR>
-nnoremap <silent> <Leader>gw :Gwrite<CR>
-nnoremap <silent> <Leader>ge :Gedit<CR>
 nnoremap <silent> <Leader>gi :Git add -p %<CR>
-nnoremap <silent> <Leader>br :Git checkout -b
 
 " --------------------------------------------------
 "  BufExplorer
@@ -404,35 +457,33 @@ let g:tagbar_autoclose = 1
 let g:tagbar_show_linenumbers = 1
 
 map <C-m> :TagbarToggle<CR>
+command! MakeTags !ctags -R .
 
 " --------------------------------------------------
 " Colours and Fonts
+" The smyck colour scheme is a not in a format suitable for pack managers, so I
+" copied the file and created a repo that was.  Check https://github.com/hukl/Smyck-Color-Scheme
+" for the latest version if mine mirror isn't up to date.
 " --------------------------------------------------
-call minpac#add('chriskempson/base16-vim')
-
-set guifont=Hasklig:h15
+call minpac#add('fullybaked/smyck.vim')
 
 set t_Co=256
 set bg=dark
-colorscheme base16-oceanicnext
+colorscheme smyck
 
-autocmd ColorScheme * hi VertSplit ctermbg=bg ctermfg=bg
-autocmd ColorScheme * hi LineNr ctermbg=bg
-autocmd ColorScheme * hi CursorLineNR cterm=bold ctermbg=8 ctermfg=15
 autocmd ColorScheme * hi clear SignColumn
-autocmd ColorScheme * hi GitGutterAdd ctermfg=green ctermbg=bg
-autocmd ColorScheme * hi GitGutterChange ctermfg=yellow ctermbg=bg
-autocmd ColorScheme * hi GitGutterDelete ctermfg=red ctermbg=bg
-autocmd ColorScheme * hi GitGutterChangeDelete ctermfg=yellow ctermbg=bg
+autocmd ColorScheme * hi GitGutterAdd ctermfg=green ctermbg=none
+autocmd ColorScheme * hi GitGutterChange ctermfg=yellow ctermbg=none
+autocmd ColorScheme * hi GitGutterDelete ctermfg=red ctermbg=none
+autocmd ColorScheme * hi GitGutterChangeDelete ctermfg=yellow ctermbg=none
+autocmd ColorScheme * highlight Search ctermbg=none cterm=underline ctermfg=none
 
-hi VertSplit ctermbg=bg ctermfg=bg
-hi LineNr ctermbg=bg
-hi CursorLineNR cterm=bold ctermbg=8 ctermfg=15
 hi clear SignColumn
-hi GitGutterAdd ctermfg=green ctermbg=bg
-hi GitGutterChange ctermfg=yellow ctermbg=bg
-hi GitGutterDelete ctermfg=red ctermbg=bg
-hi GitGutterChangeDelete ctermfg=yellow ctermbg=bg
+hi GitGutterAdd ctermfg=green ctermbg=none
+hi GitGutterChange ctermfg=yellow ctermbg=none
+hi GitGutterDelete ctermfg=red ctermbg=none
+hi GitGutterChangeDelete ctermfg=yellow ctermbg=none
+highlight Search ctermbg=none cterm=underline ctermfg=none
 
 " Trailing whitespace sucks. Show it:
 highlight ExtraWhitespace ctermbg=red guibg=red
@@ -449,7 +500,7 @@ call minpac#add('vim-airline/vim-airline')
 call minpac#add('vim-airline/vim-airline-themes')
 
 let g:airline_powerline_fonts = 1
-let g:airline_theme='base16_oceanicnext'
+let g:airline_theme='bubblegum'
 let g:airline_skip_empty_sections = 1
 let g:airline#extensions#tabline#left_sep = ''
 let g:airline#extensions#tabline#left_alt_sep = ''
@@ -464,18 +515,25 @@ let g:airline_right_alt_sep = ''
 call minpac#add('Shougo/deoplete.nvim', {'do': 'UpdateRemotePlugins'})
 call minpac#add('Shougo/neosnippet.vim')
 call minpac#add('Shougo/neosnippet-snippets')
-let g:deoplete#enable_at_startup = 1
+" call minpac#add('fishbullet/deoplete-ruby')
+
 let g:deoplete#auto_complete_start_length = 1
+let g:deoplete#enable_at_startup = 1
 let g:deoplete#enable_smart_case = 1
+" popup menu was appearing as soon as insert mode was entered. 600ms felt about
+" right to me as enough of a pause.
+let g:deoplete#auto_complete_delay = 300
 imap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
 set completeopt=longest,menuone
-autocmd FileType php set omnifunc=phpcomplete#CompletePHP
 autocmd FileType ruby,eruby set omnifunc=rubycomplete#Complete
 
 " --------------------------------------------------
 " Neoterm (Better terminal management)
 " --------------------------------------------------
 call minpac#add('kassio/neoterm')
+let g:neoterm_size = 20
+let g:neoterm_autoinsert = 0
+let g:neoterm_autoscroll = 1
 
 " Key mappings for terminal
 tnoremap <Esc> <C-\><C-n>
@@ -488,8 +546,7 @@ nnoremap <A-h> <C-w>h
 nnoremap <A-j> <C-w>j
 nnoremap <A-k> <C-w>k
 nnoremap <A-l> <C-w>l
-nnoremap <Leader>t :Topen<CR>
-
+nnoremap <S-T> :Tclose<cr>
 
 " --------------------------------------------------
 " Cool tables - like emacs org mode
@@ -513,3 +570,37 @@ inoreabbrev <expr> __
 " Syntax linting with ALE
 " --------------------------------------------------
 call minpac#add('w0rp/ale')
+
+" --------------------------------------------------
+" Vim Tmux Runner
+" --------------------------------------------------
+call minpac#add('christoomey/vim-tmux-runner')
+let g:VtrDetachedName = "detached"
+let g:VtrPercentage = 30
+
+nmap <silent> <C-e>o :VtrOpenRunner<cr>
+nmap <silent> <C-e>f :VtrFocusRunner<cr>
+nmap <silent> <C-e>a :VtrAttachToPane<cr>
+nmap <silent> <C-e>c :VtrClearRunner<cr>
+nmap <silent> <C-e>x :VtrKillRunner<cr>
+nmap <silent> <C-e>e :VtrSendLinesToRunner<cr>
+nmap <silent> <C-e>b :VtrSendCommandToRunner bundle install<cr>
+nmap <silent> <C-e>m :VtrSendCommandToRunner bundle exec rake db:migrate<cr>
+nmap <silent> <C-e>r :VtrSendCommandToRunner bundle exec rails console<cr>
+
+" Auto-create directory if it doesn't exist
+" :w - will ask to create the dir
+" :w! - will force create the dir
+" https://stackoverflow.com/questions/4292733/vim-creating-parent-directories-on-save/42872275#42872275
+augroup vimrc-auto-mkdir
+  autocmd!
+  autocmd BufWritePre * call s:auto_mkdir(expand('<afile>:p:h'), v:cmdbang)
+  function! s:auto_mkdir(dir, force)
+    if !isdirectory(a:dir)
+          \   && (a:force
+          \       || input("'" . a:dir . "' does not exist. Create? [y/N]") =~? '^y\%[es]$')
+      call mkdir(iconv(a:dir, &encoding, &termencoding), 'p')
+    endif
+  endfunction
+augroup END
+
