@@ -89,24 +89,8 @@ set winheight=999
 nnoremap <silent> <Leader>\ :vsp<cr>
 nnoremap <silent> <Leader>- :split<cr>
 
-" zoom a vim pane, <C-w>= to re-balance
-nnoremap <Leader>/ :wincmd _<cr>:wincmd \|<cr>
-nnoremap <Leader>= :wincmd =<cr>
-
-" easier split resizing with cursor keys
-nnoremap <C-Left> <C-w><
-nnoremap <C-Right> <C-w>>
-nnoremap <C-Up> <C-w>+
-nnoremap <C-Down> <C-w>-
-
-" quickly open a scratch file in current dir
-nnoremap <silent> <Leader>q :enew<cr>
-
 " clean trailing whitespace
-nnoremap <silent> <Leader>c :%s/\s\+$//e<cr>
-
-" clear highlighting
-nnoremap <silent> <Leader>h :nohl<cr>
+nnoremap <silent> <Leader>ws :%s/\s\+$//e<cr>
 
 " quick newline in normal mode
 nnoremap <silent> <Leader><Enter> o<ESC>
@@ -143,9 +127,11 @@ cnoremap <C-g>  <C-c>
 cnoremap <C-p>  <Up>
 cnoremap <C-n>  <Down>
 
+" %% expands to the path of current file
 cnoremap %% <C-R>=expand('%:h').'/'<cr>
 map <leader>e :edit %%
 map <leader>v :view %%
+
 " --------------------------------------------------
 " OPTIONS
 " --------------------------------------------------
@@ -234,6 +220,27 @@ command! W w !sudo tee % >/dev/null
 autocmd! bufwritepost .vimrc source ~/.vimrc
 autocmd! bufwritepost init.vim source ~/.config/nvim/init.vim
 
+" Auto-create directory if it doesn't exist
+" :w - will ask to create the dir
+" :w! - will force create the dir
+" https://stackoverflow.com/questions/4292733/vim-creating-parent-directories-on-save/42872275#42872275
+augroup vimrc-auto-mkdir
+  autocmd!
+  autocmd BufWritePre * call s:auto_mkdir(expand('<afile>:p:h'), v:cmdbang)
+  function! s:auto_mkdir(dir, force)
+    if !isdirectory(a:dir)
+          \   && (a:force
+          \       || input("'" . a:dir . "' does not exist. Create? [y/N]") =~? '^y\%[es]$')
+      call mkdir(iconv(a:dir, &encoding, &termencoding), 'p')
+    endif
+  endfunction
+augroup END
+
+" Jump to last cursor position unless it's invalid or in an event handler
+autocmd BufReadPost *
+      \ if line("'\"") > 0 && line("'\"") <= line("$") |
+      \   exe "normal g`\"" |
+      \ endif
 " --------------------------------------------------
 " Clipboard
 " --------------------------------------------------
@@ -295,7 +302,7 @@ let g:netrw_banner = 0 " Turn off banner
 "  Code Tools
 " --------------------------------------------------
 call minpac#add('rizzatti/dash.vim')
-nnoremap <silent> <Leader>d <Plug>DashSearch
+nnoremap <Leader>d <Plug>DashSearch
 
 call minpac#add('janko-m/vim-test')
 let g:test#preserve_screen = 1
@@ -326,8 +333,6 @@ call minpac#add('wellle/targets.vim')
 "  Langauges
 " --------------------------------------------------
 call minpac#add('mattn/emmet-vim')
-call minpac#add('kchmck/vim-coffee-script')
-call minpac#add('elixir-editors/vim-elixir')
 
 autocmd FileType text setlocal textwidth=72
 autocmd FileType text setlocal nosi
@@ -357,15 +362,31 @@ autocmd FileType ruby nmap <buffer> <Leader>r <Plug>(xmpfilter-mark)
 autocmd FileType ruby nmap <buffer> <Leader>R <Plug>(xmpfilter-run)
 
 " quick versions of the vim-rails helpers for the normal MVC
-nmap <Leader>m :Files app/models<cr>
-nmap <Leader>v :Files app/views<cr>
-nmap <Leader>c :Files app/controllers<cr>
-nmap <Leader>j :Files app/assets/javascripts<cr>
-nmap <Leader>s :Files app/assets/stylesheets<cr>
-" vsplit & jump to the test/class based on the current buffer content
+nmap <Leader>gm :Files app/models<cr>
+nmap <Leader>gv :Files app/views<cr>
+nmap <Leader>gc :Files app/controllers<cr>
+nmap <Leader>gaj :Files app/assets/javascripts<cr>
+nmap <Leader>gas :Files app/assets/stylesheets<cr>
+nmap <Leader>gt :Files test<cr>
+map <leader>gr :topleft :split config/routes.rb<cr>
+map <leader>gg :topleft 100 :split Gemfile<cr>
+" Use vim-rails :A for alternate file, but open in a vert-split buffer
 nmap <Leader>a :vs <bar> A<cr>
 " open FactoryBot definition in a vertical split
 nmap <Leader>f :RVfactory<cr>
+
+" --------------------------------------------------
+" Promote variable to let for minitest:spsc / rspec
+" --------------------------------------------------
+function! PromoteToLet()
+  :normal! dd
+  " :exec '?^\s*it\>'
+  :normal! P
+  :.s/\(\w\+\) = \(.*\)$/let(:\1) { \2 }/
+  :normal ==
+endfunction
+:command! PromoteToLet :call PromoteToLet()
+:map <leader>p :PromoteToLet<cr>
 
 " --------------------------------------------------
 " HTML / CSS
@@ -403,47 +424,17 @@ let g:ackprg = 'ag --vimgrep'
 map <C-s> :Ag!<space>
 map <C-f> :FZF<cr>
 map <C-t> :Tags<cr>
+map <leader>b :Buffers<cr>
 
 " --------------------------------------------------
 "  Git
 " --------------------------------------------------
-
 call minpac#add('tpope/vim-fugitive')
 call minpac#add('airblade/vim-gitgutter')
 
 nnoremap <silent> <Leader>gs :Gstatus<CR>
 nnoremap <silent> <Leader>gb :Gblame<CR>
 nnoremap <silent> <Leader>gp :Git push<CR>
-nnoremap <silent> <Leader>gi :Git add -p %<CR>
-
-" --------------------------------------------------
-"  BufExplorer
-" --------------------------------------------------
-call minpac#add('jlanzarotta/bufexplorer')
-nnoremap <silent> <Leader>bb :ToggleBufExplorer<CR>
-
-" --------------------------------------------------
-"  Tabularize
-" --------------------------------------------------
-"
-" Nice alignments
-"
-call minpac#add('godlygeek/tabular')
-" align to =
-nmap <Leader>a= :Tabularize /=<CR>
-vmap <Leader>a= :Tabularize /=<CR>
-
-" align to =>
-nmap <Leader>ah :Tabularize /=><CR>
-vmap <Leader>ah :Tabularize /=><CR>
-
-" align to :<space>
-nmap <Leader>a: :Tabularize /:\zs<CR>
-vmap <Leader>a: :Tabularize /:\zs<CR>
-
-" align to "
-nmap <Leader>a" :Tabularize /"<CR>
-vmap <Leader>a" :Tabularize /"<CR>
 
 " --------------------------------------------------
 "  CTags & Tagbar
@@ -461,9 +452,9 @@ command! MakeTags !ctags -R .
 
 " --------------------------------------------------
 " Colours and Fonts
-" The smyck colour scheme is a not in a format suitable for pack managers, so I
+" The smyck colour scheme was not in a format suitable for package managers, so I
 " copied the file and created a repo that was.  Check https://github.com/hukl/Smyck-Color-Scheme
-" for the latest version if mine mirror isn't up to date.
+" for the latest version if my mirror isn't up to date.
 " --------------------------------------------------
 call minpac#add('fullybaked/smyck.vim')
 
@@ -494,20 +485,79 @@ autocmd InsertLeave * match ExtraWhitespace /\s\+$/
 autocmd BufWinLeave * call clearmatches()
 
 " --------------------------------------------------
-" Better status bar / Airline
+" Status bar stuff - must come AFTER colorscheme
 " --------------------------------------------------
-call minpac#add('vim-airline/vim-airline')
-call minpac#add('vim-airline/vim-airline-themes')
+"
+" Dictionary: take mode() input -> longer notation of current mode
+" mode() is defined by Vim
+let g:currentmode={
+      \ 'n' : 'Normal ',
+      \ 'no' : 'N-Operator Pending ',
+      \ 'v' : 'Visual ',
+      \ 'V' : 'V-Line ',
+      \ '^V' : 'V-Block ',
+      \ 's' : 'Select ',
+      \ 'S': 'S-Line ',
+      \ '^S' : 'S-Block ',
+      \ 'i' : 'Insert ',
+      \ 'R' : 'Replace ',
+      \ 'Rv' : 'V-Replace ',
+      \ 'c' : 'Command ',
+      \ 'cv' : 'Vim Ex ',
+      \ 'ce' : 'Ex ',
+      \ 'r' : 'Prompt ',
+      \ 'rm' : 'More ',
+      \ 'r?' : 'Confirm ',
+      \ '!' : 'Shell ',
+      \ 't' : 'Terminal '}
 
-let g:airline_powerline_fonts = 1
-let g:airline_theme='bubblegum'
-let g:airline_skip_empty_sections = 1
-let g:airline#extensions#tabline#left_sep = ''
-let g:airline#extensions#tabline#left_alt_sep = ''
-let g:airline_left_sep = ''
-let g:airline_left_alt_sep = ''
-let g:airline_right_sep = ''
-let g:airline_right_alt_sep = ''
+" Function: return current mode
+" abort -> function will abort soon as error detected
+function! CurrentMode() abort
+    let l:modecurrent = mode()
+    " use get() -> fails safely, since ^V doesn't seem to register
+    " 3rd arg is used when return of mode() == 0, which is case with ^V
+    " thus, ^V fails -> returns 0 -> replaced with 'V Block'
+    let l:modelist = toupper(get(g:currentmode, l:modecurrent, 'V-Block '))
+    let l:current_status_mode = l:modelist
+    return l:current_status_mode
+endfunction
+
+function! CurrentBranch() abort
+  let l:currentbranch = FugitiveHead()
+  if l:currentbranch == ""
+    return ""
+  endif
+
+  return "" . l:currentbranch
+endfunction
+
+function! LinterStatus() abort
+    let l:counts = ale#statusline#Count(bufnr(''))
+
+    let l:all_errors = l:counts.error + l:counts.style_error
+    let l:all_non_errors = l:counts.total - l:all_errors
+
+    return l:counts.total == 0 ? 'OK' : printf(
+    \   '%dW %dE',
+    \   all_non_errors,
+    \   all_errors
+    \)
+endfunction
+
+autocmd ColorScheme * hi User1 ctermbg=darkgreen ctermfg=black
+autocmd ColorScheme * hi User2 ctermbg=darkred ctermfg=black
+hi User1 ctermbg=darkgreen ctermfg=black
+hi User2 ctermbg=darkred ctermfg=black
+set statusline=
+set statusline+=%2*%h%m%r%w
+set statusline+=%1*\ %{CurrentMode()}%*
+set statusline+=\ %f\ %y
+set statusline+=%=%{CurrentBranch()}
+set statusline+=\ (%l,%c)
+
+set statusline+=\ [%P\ %4L]
+set statusline+=\ %1*[%{LinterStatus()}]
 
 " --------------------------------------------------
 " Deoplete (Autocomplete)
@@ -515,17 +565,41 @@ let g:airline_right_alt_sep = ''
 call minpac#add('Shougo/deoplete.nvim', {'do': 'UpdateRemotePlugins'})
 call minpac#add('Shougo/neosnippet.vim')
 call minpac#add('Shougo/neosnippet-snippets')
-" call minpac#add('fishbullet/deoplete-ruby')
+call minpac#add('fishbullet/deoplete-ruby')
 
 let g:deoplete#auto_complete_start_length = 1
 let g:deoplete#enable_at_startup = 1
 let g:deoplete#enable_smart_case = 1
-" popup menu was appearing as soon as insert mode was entered. 600ms felt about
-" right to me as enough of a pause.
-let g:deoplete#auto_complete_delay = 300
-imap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
 set completeopt=longest,menuone
 autocmd FileType ruby,eruby set omnifunc=rubycomplete#Complete
+
+" --------------------------------------------------
+" Multi-purpose tab key - indent at start of line
+" else, pop up completion
+" --------------------------------------------------
+function! InsertTabWrapper()
+    let col = col('.') - 1
+    if !col || getline('.')[col - 1] !~ '\k'
+        return "\<tab>"
+    else
+        return "\<c-n>"
+    endif
+endfunction
+inoremap <expr> <tab> InsertTabWrapper()
+
+" --------------------------------------------------
+" Rename current file
+" --------------------------------------------------
+function! RenameFile()
+    let old_name = expand('%')
+    let new_name = input('New file name: ', expand('%'), 'file')
+    if new_name != '' && new_name != old_name
+        exec ':saveas ' . new_name
+        exec ':silent !rm ' . old_name
+        redraw!
+    endif
+endfunction
+map <leader>rn :call RenameFile()<cr>
 
 " --------------------------------------------------
 " Neoterm (Better terminal management)
@@ -549,24 +623,6 @@ nnoremap <A-l> <C-w>l
 nnoremap <S-T> :Tclose<cr>
 
 " --------------------------------------------------
-" Cool tables - like emacs org mode
-" --------------------------------------------------
-call minpac#add('dhruvasagar/vim-table-mode')
-function! s:isAtStartOfLine(mapping)
-  let text_before_cursor = getline('.')[0 : col('.')-1]
-  let mapping_pattern = '\V' . escape(a:mapping, '\')
-  let comment_pattern = '\V' . escape(substitute(&l:commentstring, '%s.*$', '', ''), '\')
-  return (text_before_cursor =~? '^' . ('\v(' . comment_pattern . '\v)?') . '\s*\v' . mapping_pattern . '\v$')
-endfunction
-
-inoreabbrev <expr> <bar><bar>
-          \ <SID>isAtStartOfLine('\|\|') ?
-          \ '<c-o>:TableModeEnable<cr><bar><space><bar><left><left>' : '<bar><bar>'
-inoreabbrev <expr> __
-          \ <SID>isAtStartOfLine('__') ?
-          \ '<c-o>:silent! TableModeDisable<cr>' : '__'
-
-" --------------------------------------------------
 " Syntax linting with ALE
 " --------------------------------------------------
 call minpac#add('w0rp/ale')
@@ -576,7 +632,7 @@ call minpac#add('w0rp/ale')
 " --------------------------------------------------
 call minpac#add('christoomey/vim-tmux-runner')
 let g:VtrDetachedName = "detached"
-let g:VtrPercentage = 30
+let g:VtrPercentage = 20
 
 nmap <silent> <C-e>o :VtrOpenRunner<cr>
 nmap <silent> <C-e>f :VtrFocusRunner<cr>
@@ -587,20 +643,4 @@ nmap <silent> <C-e>e :VtrSendLinesToRunner<cr>
 nmap <silent> <C-e>b :VtrSendCommandToRunner bundle install<cr>
 nmap <silent> <C-e>m :VtrSendCommandToRunner bundle exec rake db:migrate<cr>
 nmap <silent> <C-e>r :VtrSendCommandToRunner bundle exec rails console<cr>
-
-" Auto-create directory if it doesn't exist
-" :w - will ask to create the dir
-" :w! - will force create the dir
-" https://stackoverflow.com/questions/4292733/vim-creating-parent-directories-on-save/42872275#42872275
-augroup vimrc-auto-mkdir
-  autocmd!
-  autocmd BufWritePre * call s:auto_mkdir(expand('<afile>:p:h'), v:cmdbang)
-  function! s:auto_mkdir(dir, force)
-    if !isdirectory(a:dir)
-          \   && (a:force
-          \       || input("'" . a:dir . "' does not exist. Create? [y/N]") =~? '^y\%[es]$')
-      call mkdir(iconv(a:dir, &encoding, &termencoding), 'p')
-    endif
-  endfunction
-augroup END
 

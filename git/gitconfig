@@ -30,15 +30,23 @@
     changed = green
     untracked = blue
 [alias]
-    co = checkout
-    br = branch
-    ci = commit
-    st = status
-    unstage = reset HEAD --
-    last = log -1 HEAD
-    undo = reset --soft HEAD~
-    lg =  log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all
+  aa = add --all
+  ap = add -p
+  br = branch
+  ci = commit
+  cm = commit -m
+  co = checkout
+  dc = diff --staged
+  freebase = !git co master && git fetch && git rebase origin/master && git co -
+  last = log -1 HEAD
+  lg =  log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all
+  nuke = !git co master && git br --merged | grep -v master | xargs -n 1 git br -d
+  st = status
+  undo = reset --soft HEAD~
+  unstage = reset HEAD --
 [branch]
     autosetuprebase = always
 [help]
   autocorrect = 1
+[commit]
+	verbose = true
