@@ -1,34 +1,33 @@
-
 [core]
-    quotepath = false
-    editor = nvim
-    excludesfile = /Users/dave/.gitignore
+  quotepath = false
+  editor = nvim
+  excludesfile = /Users/dave/.gitignore
 [user]
-    name = Dave Baker
-    email = david@fullybaked.co.uk
-    trustExitCode = true
+  name = Dave Baker
+  email = david@fullybaked.co.uk
+  trustExitCode = true
 [push]
-    default = current
+  default = current
 [color]
-    diff = auto
-    status = auto
-    branch = auto
-    interactive = auto
-    ui = true
-    pager = true
+  diff = auto
+  status = auto
+  branch = auto
+  interactive = auto
+  ui = true
+  pager = true
 [color "branch"]
-    current = yellow reverse
-    local   = yellow
-    remote  = green
+  current = yellow reverse
+  local   = yellow
+  remote  = green
 [color "diff"]
-    meta = blue
-    frag = magenta
-    old  = red
-    new  = green
+  meta = blue
+  frag = magenta
+  old  = red
+  new  = green
 [color "status"]
-    added = yellow
-    changed = green
-    untracked = blue
+  added = yellow
+  changed = green
+  untracked = blue
 [alias]
   aa = add --all
   ap = add -p
@@ -44,9 +43,13 @@
   st = status
   undo = reset --soft HEAD~
   unstage = reset HEAD --
+  fpush = push --force-with-lease
+  cst = !hub ci-status
+  fudge = commit --amend --no-edit
+  recent = for-each-ref --sort=-committerdate --count=10 --format='%(refname:short)' refs/heads/
 [branch]
-    autosetuprebase = always
+  autosetuprebase = always
 [help]
   autocorrect = 1
 [commit]
-	verbose = true
+  verbose = true

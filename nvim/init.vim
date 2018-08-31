@@ -551,13 +551,12 @@ hi User1 ctermbg=darkgreen ctermfg=black
 hi User2 ctermbg=darkred ctermfg=black
 set statusline=
 set statusline+=%2*%h%m%r%w
+set statusline+=%1*[%{LinterStatus()}]
 set statusline+=%1*\ %{CurrentMode()}%*
 set statusline+=\ %f\ %y
 set statusline+=%=%{CurrentBranch()}
 set statusline+=\ (%l,%c)
-
-set statusline+=\ [%P\ %4L]
-set statusline+=\ %1*[%{LinterStatus()}]
+set statusline+=\ [%P\ of\ %4L]
 
 " --------------------------------------------------
 " Deoplete (Autocomplete)
@@ -632,7 +631,7 @@ call minpac#add('w0rp/ale')
 " --------------------------------------------------
 call minpac#add('christoomey/vim-tmux-runner')
 let g:VtrDetachedName = "detached"
-let g:VtrPercentage = 20
+let g:VtrPercentage = 30
 
 nmap <silent> <C-e>o :VtrOpenRunner<cr>
 nmap <silent> <C-e>f :VtrFocusRunner<cr>
@@ -643,4 +642,3 @@ nmap <silent> <C-e>e :VtrSendLinesToRunner<cr>
 nmap <silent> <C-e>b :VtrSendCommandToRunner bundle install<cr>
 nmap <silent> <C-e>m :VtrSendCommandToRunner bundle exec rake db:migrate<cr>
 nmap <silent> <C-e>r :VtrSendCommandToRunner bundle exec rails console<cr>
-
