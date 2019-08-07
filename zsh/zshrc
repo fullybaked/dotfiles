@@ -26,14 +26,16 @@ export FZF_DEFAULT_OPTS='
 alias grep='ag'
 
 # Git aliases
+alias g="git"
 alias gst='git status'
 alias gci='git commit --verbose'
+alias gap='git add -p'
 alias gaa='git add --all'
 alias gco='git checkout'
 alias gfp='git fpush'
-alias gap='git add -p'
 alias gfr='git freebase'
 alias gbr='git branch'
+alias gfu='git fudge'
 
 # Ruby/Rails/Engineering aliases (Mainly for Dribbble setup)
 alias be='bundle exec'
@@ -51,6 +53,8 @@ alias prs="open https://github.com/dribbble/dribbble/pulls/fullybaked"
 # Short-cuts to frequently visited directories
 alias code='cd ~/Code/'
 alias drib='cd ~/Code/dribbble/dribbble'
+
+alias ll='ls -l'
 
 # List everything running under spring
 function springs() {
