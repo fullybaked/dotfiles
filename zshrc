@@ -1,0 +1,151 @@
+# Use emacs keybindings on command line
+bindkey -e
+
+# Load zsh completions
+zstyle ':completion:*' menu select
+zstyle ':completion:*' completer _complete
+zstyle ':completion:*' matcher-list '' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' '+l:|=* r:|=*'
+
+autoload -U compinit && compinit
+
+# Load fzf bindings
+if [ -e /usr/local/opt/fzf/shell/completion.zsh ]; then
+  source /usr/local/opt/fzf/shell/key-bindings.zsh
+  source /usr/local/opt/fzf/shell/completion.zsh
+fi
+# Configure fzf and ag
+export FZF_DEFAULT_COMMAND='ag --nocolor -g ""'
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_ALT_C_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_DEFAULT_OPTS='
+--color fg:242,bg:236,hl:65,fg+:15,bg+:239,hl+:108
+--color info:108,prompt:109,spinner:108,pointer:168,marker:168
+'
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+# Always use ag
+alias grep='ag'
+
+# Git aliases
+alias gst='git status'
+alias gci='git commit --verbose'
+alias gaa='git add --all'
+alias gco='git checkout'
+alias gfp='git fpush'
+alias gap='git add -p'
+alias gfr='git freebase'
+alias gbr='git branch'
+
+# Ruby/Rails/Engineering aliases (Mainly for Dribbble setup)
+alias be='bundle exec'
+alias trails='RAILS_ENV=test rails'
+# normal rails server
+alias rs='PROD_IAGES=1 bundle exec rails server'
+# single thread server with production images
+alias rss='PROD_IMAGES=1 WEB_CONCURRENCY=1 bundle exec rails server'
+alias console='env DISABLE_SPRING=1 bin/rails console'
+alias dbconsole='psql -h localhost -U postgres dribbble_dev'
+
+# Jump to my Dribbble PRs
+alias prs="open https://github.com/dribbble/dribbble/pulls/fullybaked"
+
+# Short-cuts to frequently visited directories
+alias code='cd ~/Code/'
+alias drib='cd ~/Code/dribbble/dribbble'
+
+# List everything running under spring
+function springs() {
+  ps -ef | grep -v grep | grep spring
+}
+
+# Kill all spring processes
+function killspring() {
+  echo "Starting with these springsÉ"
+  springs || echo "None"
+
+  echo "Killing those springsÉ"
+  springs | awk '{ print $2 }' | xargs -n1 kill
+  sleep 1
+
+  echo "Now we have these springsÉ"
+  springs || echo "None"
+}
+
+# Auto-completion for Dribbble's opsicle
+_opsicle() {
+  actions=("chef-update instances ssh")
+  envs=("${(@)${(f)$(grep ':$' .opsicle | tr -d :)}}")
+
+  _arguments "1: :($actions)" "2: :($envs)"
+}
+compdef _opsicle opsicle
+
+# Auto-completion for Dribbble's deploy
+_deploy() {
+  envs=("${(@)${(f)$(grep ':$' .opsicle | tr -d :)}}")
+  branches=("${(@)${(f)$(git branch | sed 's/\*/ /g')}#??}")
+  _arguments "1: :($envs)" "2: :($branches)"
+}
+compdef _deploy deploy
+
+# Default to Neovim for editor and short-cut to `o`
+export EDITOR=nvim
+alias o=$EDITOR
+
+# Add Homebrew dirs to PATH
+export PATH=/usr/local/bin:/usr/local/sbin:$PATH
+export PATH=$HOME/bin:$PATH
+
+# Rbenv config
+export PATH="$HOME/.rbenv/bin:$PATH"
+eval "$(rbenv init -)"
+
+# For psql to connect to Postgresql on Docker
+export PGHOST=0.0.0.0
+
+# History settings
+HISTFILE=$HOME/.zsh_history
+HISTSIZE=10000
+SAVEHIST=10000
+
+# if the entered text is not a command, and _is_ a directory, cd to that directory
+setopt auto_cd
+# always put cursor at the end if completion from within a word
+setopt always_to_end
+# store history from all sessions
+setopt append_history
+# turn off menu_complete (it overrides auto_menu if it's on)
+unsetopt menu_complete
+# use menu completion after 2nd request for competion
+setopt auto_menu
+# store timestamps and running times in the history file
+setopt extended_history
+# trim duplicates before unique commands from history first
+setopt hist_expire_dups_first
+# don't enter duplicates in history if they match previous event
+setopt hist_ignore_dups
+# don't auto-run history commands, put them in the buffer first
+setopt hist_verify
+# add commands to history file incrementally not at shell exit
+setopt inc_append_history
+# allow comments, even in interactive shells
+setopt interactive_comments
+
+# Get the current git branch and colourise it for the prompt
+# use lambda prompt if not in a git repo
+git_prompt() {
+  BRANCH=$(git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/*\(.*\)/\1/')
+
+  if [ ! -z $BRANCH ]; then
+    if [ ! -z "$(git status --short)" ]; then
+      echo -n "%F{yellow}$BRANCH %F{red}%Bλ%b"
+    else
+      echo -n "%F{yellow}$BRANCH %F{blue}%Bλ%b"
+    fi
+  else
+    echo -n "%F{blue} %Bλ%b"
+  fi
+}
+# allow command substitution
+set -o PROMPT_SUBST
+# set the prompt
+PS1='$(git_prompt) %F{reset}'
