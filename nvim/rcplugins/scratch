@@ -1,0 +1,11 @@
+" --------------------------------------------------
+" Scratch buffer
+" --------------------------------------------------
+call minpac#add("mtth/scratch.vim")
+nmap gy <plug>(scratch-insert-reuse)
+nmap gY <plug>(scratch-insert-clear)
+xmap gy <plug>(scratch-selection-reuse)
+xmap gY <plug>(scratch-selection-clear)
+nnoremap gZzZz gy
+
+" vim:ft=vim

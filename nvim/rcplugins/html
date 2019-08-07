@@ -1,0 +1,7 @@
+call minpac#add('etdev/vim-hexcolor')
+call minpac#add('tpope/vim-ragtag')
+call minpac#add('mattn/emmet-vim')
+
+autocmd FileType html :set spl=en_gb spell
+
+" vim:ft=vim

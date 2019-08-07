@@ -1,0 +1,16 @@
+" --------------------------------------------------
+"  Git
+" --------------------------------------------------
+call minpac#add('tpope/vim-fugitive')
+call minpac#add('airblade/vim-gitgutter')
+
+autocmd FileType gitcommit set spell
+autocmd BufEnter PULLREQ_EDITMSG setlocal filetype=gitcommit
+
+command! RebaseSquash silent execute '2,$s/^pick/s/|silent! w!|2'
+
+nnoremap <silent> <Leader>gs :Gstatus<CR>
+nnoremap <silent> <Leader>gb :Gblame<CR>
+nnoremap <silent> <Leader>gp :Git push --force<CR>
+
+" vim:ft=vim

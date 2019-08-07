@@ -1,0 +1,5 @@
+autocmd FileType text setlocal textwidth=72
+autocmd FileType text setlocal nosi
+autocmd FileType text :set spl=en_gb spell
+
+" vim:ft=vim

@@ -1,0 +1,23 @@
+" Ack - Integrate ack (grep replacement) into vim
+" But actually use ag (silver surfer)
+
+call minpac#add('mileszs/ack.vim')
+
+nmap <C-s> :Ag!<space>
+nnoremap <leader>cc :cclose<cr>
+nnoremap K :Ag! <C-r><C-w><cr>
+vnoremap K :<C-u>call <sid>VisualAck()<cr>
+
+function! s:VisualAck()
+  let temp = @"
+  normal! gvy
+  let escaped_pattern = escape(@", "[]().*")
+  let @" = temp
+  execute "Ag! '" . escaped_pattern . "'"
+endfunction
+
+let g:ackprg = 'ag --nogroup --nocolor --column'
+
+set grepprg=ag\ --nogroup\ --nocolor\ --column
+
+" vim:ft=vim

@@ -1,0 +1,35 @@
+" better window movement shortcuts
+nmap <C-j> <C-W>j
+nmap <C-k> <C-W>k
+nmap <C-h> <C-W>h
+nmap <C-l> <C-W>l
+
+" skim through buffers
+nmap <C-p> :bprev<cr>
+nmap <C-n> :bnext<cr>
+
+" better tab nav
+nmap <C-t>o :tabnew<cr>
+
+" open current file in new tab
+nmap <C-t>e :tabedit %<cr>
+nmap <C-t>x :tabclose<cr>
+
+" Resize windows so current is biggest
+set winwidth=100
+
+" We have to have a winheight bigger than we want to set winminheight. But if
+" we set winheight to be huge before winminheight, the winminheight set will
+" fail.
+set winheight=6
+set winminheight=6
+set winheight=999
+
+" automatically rebalance windows on vim resize
+autocmd VimResized * :wincmd =
+
+" Short cut to splits (\ is the | without a shift)
+nnoremap <silent> <Leader>\ :vsp<cr>
+nnoremap <silent> <Leader>- :split<cr>
+
+" vim:ft=vim

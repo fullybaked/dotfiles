@@ -1,0 +1,12 @@
+function! ToggleWrap()
+  if &wrap == 1
+    set nowrap
+  else
+    set wrap
+  endif
+endfunction
+
+" turn wrap on/off
+nnoremap <silent> <Leader>w :call ToggleWrap()<cr>
+
+" vim:ft=vim

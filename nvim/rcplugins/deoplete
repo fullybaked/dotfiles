@@ -1,0 +1,13 @@
+" --------------------------------------------------
+" Deoplete (Autocomplete)
+" --------------------------------------------------
+call minpac#add('Shougo/deoplete.nvim', {'do': 'UpdateRemotePlugins'})
+call minpac#add('fishbullet/deoplete-ruby')
+
+let g:deoplete#auto_complete_start_length = 1
+let g:deoplete#enable_at_startup = 1
+let g:deoplete#enable_smart_case = 1
+set completeopt=longest,menuone
+autocmd FileType ruby,eruby set omnifunc=rubycomplete#Complete
+
+" vim:ft=vim

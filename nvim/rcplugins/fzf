@@ -1,0 +1,14 @@
+" --------------------------------------------------
+"  Fuzzy searching
+" --------------------------------------------------
+call minpac#add('junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' })
+call minpac#add('junegunn/fzf.vim')
+
+set rtp+=/usr/local/opt/fzf
+set rtp+=~/.fzf
+
+map <C-f> :FZF<cr>
+map <C-t>t :Tags<cr>
+map <leader>b :Buffers<cr>
+
+" vim:ft=vim

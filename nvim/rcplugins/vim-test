@@ -1,0 +1,14 @@
+" --------------------------------------------------
+"  Set up vim-test, requires vim-tmux-runner
+" --------------------------------------------------
+call minpac#add('janko-m/vim-test')
+let g:test#preserve_screen = 1
+
+" VimTmuxRunner version
+let g:test#strategy='vtr'
+let test#ruby#use_binstubs = 0
+nmap <silent> <Leader>tn :TestNearest<CR>:VtrFocusRunner<cr>
+nmap <silent> <Leader>tf :TestFile<CR>:VtrFocusRunner<cr>
+nmap <silent> <Leader>tl :TestLast<CR>:VtrFocusRunner<cr>
+
+" vim:ft=vim

@@ -1,0 +1,23 @@
+" --------------------------------------------------
+" Vim Tmux Runner
+" --------------------------------------------------
+call minpac#add('christoomey/vim-tmux-runner')
+let g:VtrDetachedName = "detached"
+let g:VtrPercentage = 5
+
+nmap <silent> <C-e>o :VtrOpenRunner<cr>
+nmap <silent> <C-e>f :VtrFocusRunner<cr>
+nmap <silent> <C-e>a :VtrAttachToPane<cr>
+nmap <silent> <C-e>d :VtrDetachRunner<cr>
+nmap <silent> <C-e>c :VtrClearRunner<cr>
+vmap <silent> <C-e>c :VtrClearRunner<cr>
+nmap <silent> <C-e>x :VtrKillRunner<cr>
+nmap <silent> <C-e>e :VtrSendLinesToRunner<cr>
+" need this one in visual mode for visually highlighted code blocks
+vmap <silent> <C-e>e :VtrSendLinesToRunner<cr>
+nmap <silent> <C-e>b :VtrSendCommandToRunner bundle install<cr>
+nmap <silent> <C-e>mm :VtrSendCommandToRunner bundle exec rails db:migrate<cr>
+nmap <silent> <C-e>mt :VtrSendCommandToRunner bundle exec rails db:migrate RAILS_ENV=test<cr>
+nmap <silent> <C-e>r :VtrSendCommandToRunner env DISABLE_SPRING=1 bundle exec rails console<cr>
+
+" vim:ft=vim

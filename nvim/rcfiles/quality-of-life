@@ -1,0 +1,29 @@
+" --------------------------------------------------
+"  Smaller 'quality of life' packages
+" --------------------------------------------------
+" Enable extended % matching
+runtime macros/matchit.vim
+" Surrounding characters (ludicrously useful)
+call minpac#add('tpope/vim-surround')
+" Pairs of handy bracket mappings
+call minpac#add('tpope/vim-unimpaired')
+" Repeat plugin actions (e.g., from vim-surround, vim-unimpaired)
+call minpac#add('tpope/vim-repeat')
+" Automatically enter closing tokens (e.g., 'end' in Ruby)
+call minpac#add('tpope/vim-endwise')
+" Auto close quote, parens, braces etc
+call minpac#add('raimondi/delimitmate')
+" Better nav with tmux see https://github.com/christoomey/vim-tmux-navigator
+call minpac#add('christoomey/vim-tmux-navigator')
+" Easy line commenting
+call minpac#add('tpope/vim-commentary')
+" Better syntax highlighting support
+call minpac#add('sheerun/vim-polyglot')
+" Enable gr command to replace motion/object with current anonymous register
+call minpac#add('vim-scripts/ReplaceWithRegister')
+" Sort motion bound to `gs` (sort values in <textobject>)
+call minpac#add('christoomey/vim-sort-motion')
+" 3-in-1 word variants plugin - Abolish, Subvert, and coercion
+call minpac#add('tpope/vim-abolish')
+
+"  vim:ft=vim

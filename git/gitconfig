@@ -3,8 +3,8 @@
   editor = nvim
   excludesfile = /Users/dave/.gitignore
 [user]
-  name = Dave Baker
-  email = david@fullybaked.co.uk
+	name = fullybaked
+	email = david@fullybaked.co.uk
   trustExitCode = true
 [push]
   default = current
@@ -53,3 +53,8 @@
   autocorrect = 1
 [commit]
   verbose = true
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true

@@ -1,0 +1,3 @@
+call minpac#add('elixir-editors/vim-elixir')
+
+" vim:ft=vim

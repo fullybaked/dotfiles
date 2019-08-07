@@ -1,0 +1,3 @@
+autocmd FileType markdown :set spl=en_gb spell
+
+" vim:ft=vim

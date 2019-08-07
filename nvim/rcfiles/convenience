@@ -1,0 +1,88 @@
+" easier escaping from home row
+inoremap <silent> jj <Esc>
+
+" bounce between two buffers
+nnoremap <leader><leader> <c-^>
+
+" turn off linewise keys, always move up/down one line even if wrapped
+nnoremap <silent> j gj
+nnoremap <silent> k gk
+
+" make Y act like D and C, yank to end of current line
+nnoremap <silent> Y y$
+
+" This will run the macro in q register
+nnoremap Q @q
+
+" Swap 0 and ^. I tend to want to jump to the first non-whitespace character
+" so make that the easier one to do.
+nnoremap 0 ^
+nnoremap ^ 0
+
+" Use Ctrl-Q, to Esc out of any mode
+nnoremap <C-q> <Esc>:noh<CR>
+vnoremap <C-q> <Esc>gV
+onoremap <C-q> <Esc>
+cnoremap <C-q> <C-c>
+inoremap <C-q> <Esc>
+
+" clean trailing whitespace
+nnoremap <silent> <Leader>ws :%s/\s\+$//e<cr>
+
+" quick newline in normal mode
+nnoremap <silent> <Leader><Enter> o<ESC>
+
+" open my vimrc
+nnoremap <silent> <Leader>i :tabedit $MYVIMRC<cr>
+
+" Emacs-like bindings in the command line from `:h emacs-keys`
+cnoremap <C-a>  <Home>
+cnoremap <C-b>  <Left>
+cnoremap <C-f>  <Right>
+cnoremap <C-d>  <Del>
+cnoremap <C-e>  <End>
+cnoremap <M-b>  <S-Left>
+cnoremap <M-f>  <S-Right>
+cnoremap <C-g>  <C-c>
+cnoremap <C-p>  <Up>
+cnoremap <C-n>  <Down>
+
+" %% expands to the path of current file
+cnoremap %% <C-R>=expand('%:h').'/'<cr>
+nmap <leader>e :edit %%
+nmap <leader>v :view %%
+
+" force a sudo write on file via :W
+command! W w !sudo tee % >/dev/null
+
+" Quick sourcing of the current file, allowing for quick vimrc testing
+nnoremap <leader>sop :source %<cr>
+
+augroup vimrcEx
+  autocmd!
+  " When editing a file, always jump to the last known cursor position.
+  " Don't do it for commit messages, when the position is invalid, or when
+  " inside an event handler (happens when dropping a file on gvim).
+  autocmd BufReadPost *
+    \ if &ft != 'gitcommit' && line("'\"") > 0 && line("'\"") <= line("$") |
+    \   exe "normal g`\"" |
+    \ endif
+augroup END
+
+" Auto-create directory if it doesn't exist
+" :w - will ask to create the dir
+" :w! - will force create the dir
+" https://stackoverflow.com/questions/4292733/vim-creating-parent-directories-on-save/42872275#42872275
+augroup vimrc-auto-mkdir
+  autocmd!
+  autocmd BufWritePre * call s:auto_mkdir(expand('<afile>:p:h'), v:cmdbang)
+  function! s:auto_mkdir(dir, force)
+    if !isdirectory(a:dir)
+          \   && (a:force
+          \       || input("'" . a:dir . "' does not exist. Create? [y/N]") =~? '^y\%[es]$')
+      call mkdir(iconv(a:dir, &encoding, &termencoding), 'p')
+    endif
+  endfunction
+augroup END
+
+" vim:ft=vim
