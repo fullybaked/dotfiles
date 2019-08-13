@@ -30,7 +30,7 @@ nmap <Leader>gm :Files app/models<cr>
 nmap <Leader>gv :Files app/views<cr>
 nmap <Leader>gc :Files app/controllers<cr>
 nmap <Leader>gj :Files app/assets/javascripts<cr>
-nmap <Leader>gs :Files app/assets/stylesheets<cr>
+nmap <Leader>gas :Files app/assets/stylesheets<cr>
 nmap <Leader>gt :Files test<cr>
 " Use vim-rails :A for alternate file, but open in a vert-split buffer
 nmap <Leader>a :vs <bar> A<cr>
@@ -63,6 +63,7 @@ inoremap <expr> <C-x><C-r> fzf#complete({
 
 fun! SetMyAssertions()
     syn match myAssertions /\%(assert_valid\)\|\%(refute_valid\)/
+    syn match myAssertions /\%(assert_unsorted_results\)/
     hi link myAssertions rubyAssertion
 endfu
 autocmd bufenter * :call SetMyAssertions()

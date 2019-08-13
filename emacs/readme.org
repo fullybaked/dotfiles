@@ -1,0 +1,723 @@
+#+TITLE: Emacs Configuration
+#+AUTHOR: David Baker
+#+EMAIL: david@fullybaked.io
+
+* Better defaults
+Increase the garbage collection limit to =20MB= so it runs less frequently and should make Emacs feel snappier.
+
+#+BEGIN_SRC emacs-lisp
+(setq-default gc-cons-threshold 20000000)
+#+END_SRC
+
+End sentences with a single space after the full-stop.
+
+#+BEGIN_SRC emacs-lisp
+(setq-default sentence-end-double-space nil)
+#+END_SRC
+
+Always confirm before exiting Emacs
+
+#+BEGIN_SRC emacs-lisp
+(setq-default confirm-kill-emacs 'yes-or-no-p)
+#+END_SRC
+
+Disable the default startup screen for Emacs
+
+#+BEGIN_SRC emacs-lisp
+(setq-default inhibit-startup-screen t)
+#+END_SRC
+
+Empty the =*scratch*= buffer
+
+#+BEGIN_SRC emacs-lisp
+(setq-default initial-scratch-message nil)
+#+END_SRC
+
+Hide the cursor in windows that don't have focus
+
+#+BEGIN_SRC emacs-lisp
+(setq-default cursor-in-non-selected-windows nil)
+#+END_SRC
+
+Merge Emacs registers and OS clipboard for smoother cut/copy/paste experience
+
+#+BEGIN_SRC emacs-lisp
+(setq-default select-enable-clipboard t)
+#+END_SRC
+
+Display trailing whitespace everywhere, and get rid of it when we save the file
+
+#+BEGIN_SRC emacs-lisp
+(setq-default show-trailing-whitespace t)
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
+#+END_SRC
+
+Set up my prefered global tabs
+- I use spaces everywhere unless the project specifically uses tabs
+- I like small indents - mostly working with Ruby/Rails so lets make this 2
+
+#+BEGIN_SRC emacs-lisp
+(setq-default indent-tabs-mode nil)
+(setq-default tab-width 2)
+#+END_SRC
+
+Always focus in help windows when they are opened as I'll most likely want to navigate in them
+
+#+BEGIN_SRC emacs-lisp
+(setq-default help-window-select t)
+#+END_SRC
+
+No delay on showing matching parens
+
+#+BEGIN_SRC emacs-lisp
+(setq-default show-paren-delay 0.0)
+#+END_SRC
+
+Show file sizes in human readable formats in Dired
+
+#+BEGIN_SRC emacs-lisp
+(setq-default dired-listing-switches "-alh")
+#+END_SRC
+
+Follow symlinks when opening files
+
+#+BEGIN_SRC emacs-lisp
+(setq-default vc-follow-symlinks t)
+#+END_SRC
+
+Replace Yes/No prompts with Y/N
+
+#+BEGIN_SRC emacs-lisp
+(fset 'yes-or-no-p 'y-or-n-p)
+#+END_SRC
+
+Iterate through CamelCase words as if they are separate words
+
+#+BEGIN_SRC emacs-lisp
+(global-subword-mode 1)
+#+END_SRC
+
+Default to =utf-8= encodings
+
+#+BEGIN_SRC emacs-lisp
+(set-default-coding-systems 'utf-8)
+#+END_SRC
+
+Indicate matching parens
+
+#+BEGIN_SRC emacs-lisp
+(show-paren-mode t)
+#+END_SRC
+
+If a file is updated outside of Emacs while open in Emacs, make sure it reloads so content is always current.
+
+#+BEGIN_SRC emacs-lisp
+(global-auto-revert-mode t)
+#+END_SRC
+
+If we can turn on syntax highlighting, then do so.
+
+#+BEGIN_SRC emacs-lisp
+(global-font-lock-mode t)
+#+END_SRC
+
+Let's startup with the home directory as our initial working directory
+
+#+BEGIN_SRC emacs-lisp
+(cd "~/")
+#+END_SRC
+
+Visually highlight marked regions - this /does/ change some functions behaviours so if you want to know more check out =C-h d transient=.
+
+#+BEGIN_SRC emacs-lisp
+(transient-mark-mode t)
+#+END_SRC
+
+Enable =delete-selection-mode= which makes Emacs behave more like /other/ editors and will replace the marked region with the new text.
+
+#+BEGIN_SRC emacs-lisp
+(delete-selection-mode t)
+#+END_SRC
+
+* Setup =use-package=
+
+Initial configuration for =use-package= is in =init.el=, which ensures it is installed first.
+
+This ensures packages are installed if they are not already available. It means that should  Emacs be opened on a fresh computer, this should fetch all required packages.
+
+#+BEGIN_SRC emacs-lisp
+
+(require 'use-package-ensure)
+(setq use-package-always-ensure t)
+
+#+END_SRC
+
+Lets's make sure we always compile packages, and use the latest version.
+
+#+BEGIN_SRC emacs-lisp
+
+(use-package auto-compile
+  :config (auto-compile-on-load-mode))
+
+(setq load-prefer-newer t)
+
+#+END_SRC
+
+* Setup & load =custom.el=
+
+I don't want any customisations being written to my =init.el= so let's keep them in their own file out of the way.
+
+This also means they don't cause Git to think there has been changes except when the file is /actually/ changed by me.
+
+#+BEGIN_SRC emacs-lisp
+
+(setq-default custom-file (expand-file-name ".custom.el" user-emacs-directory))
+(when (file-exists-p custom-file)
+  (load custom-file))
+
+#+END_SRC
+
+* Backup to =/tmp=
+
+Store backups in the system temp dir instead of the same dir as the file. We're still making backups but not getting in the way.
+
+*Warning*: =/tmp= can be volatile, and which means backups probably won't survive a crash. If you don't want this risk, don't use this setting.
+
+This is probably ok if you don't use backups a alot, and/or save reflexively. There is a risk of data loss though so only use this if you are absolutely sure.
+
+It's wrapped in a function so you can easily toggle it on or off.
+
+#+BEGIN_SRC emacs-lisp
+
+(defun fullybaked/backup-to-tmp ()
+  "Store backup files in TEMP-FILE-DIR, which is usually /tmp, instead of in the same dir as the file being edited. We're still backing up, but not putting them in the way."
+  (setq backup-directory-alist
+    `((".*" . ,temporary-file-directory)))
+  (setq auto-save-file-name-transforms
+    `((".*" ,temporary-file-directory t))))
+
+;; remove this line if you don't want this behaviour
+(fullybaked/backup-to-tmp)
+
+#+END_SRC
+
+* UI Preferences
+** Font
+
+Set the default font to [[https://dank.sh/][=Dank Mono=]] assuming it is installed.
+
+#+BEGIN_SRC emacs-lisp
+
+(when (member "Dank Mono" (font-family-list))
+  (set-frame-font "Dank Mono-21" nil t))
+
+#+END_SRC
+** Themes
+
+Load in some themes:
+- [[https://github.com/greduan/emacs-theme-gruvbox][Gruvbox theme]]
+
+#+BEGIN_SRC emacs-lisp
+
+(use-package gruvbox-theme)
+
+#+END_SRC
+
+Active Gruvbox by default
+
+#+BEGIN_SRC emacs-lisp
+
+(load-theme 'gruvbox-dark-soft t)
+
+#+END_SRC
+
+** Tweak the window chrome
+
+Remove the chrome from around Emacs, like the menu bar, scroll bar etc.
+
+ #+BEGIN_SRC emacs-lisp
+
+(when window-system
+  (blink-cursor-mode 0)                           ; Disable the cursor blinking
+  (scroll-bar-mode 0)                             ; Disable the scroll bar
+  (tool-bar-mode 0)                               ; Disable the tool bar
+  (tooltip-mode 0)                                ; Disable the tooltips
+  (menu-bar-mode 0))                              ; Disable the menu bar
+
+ #+END_SRC
+
+Disable the small scroll bar that appears in the mini-buffer.
+
+#+BEGIN_SRC emacs-lisp
+
+(set-window-scroll-bars (minibuffer-window) nil nil)
+
+#+END_SRC
+
+Start Emacs in full screen
+
+ #+BEGIN_SRC emacs-lisp
+
+(if (eq window-system 'ns)
+  (toggle-frame-maximized)
+  (toggle-frame-fullscreen))
+
+ #+END_SRC
+** Use =minions= to hide all minor modes
+
+I don't really want to see all the various minor modes in the modeline, I've tried =diminish=, but that requires per-package setup, either in =use-package= config or on a separate configuration line.
+
+=minions= goes right ahead and hides all minor modes.
+
+#+BEGIN_SRC emacs-lisp
+
+(use-package minions
+  :config
+  (setq minions-mode-line-lighter ""
+        minions-mode-line-delimiters '("" . ""))
+  (minions-mode 1))
+
+#+END_SRC
+** Customise visual bell
+
+I don't want Emacs beeping at me everytime I =C-g= or when it otherwise needs to alert me, but I don't want to loose the alert completely.  Flashing the whole screen =visible-bell= was pretty jarring, so this sets it up to only flash the modeline.
+
+#+BEGIN_SRC emacs-lisp
+
+(defun fullybaked/flash-mode-line ()
+  (invert-face 'mode-line)
+  (run-with-timer 0.1 nil #'invert-face 'mode-line))
+
+(setq visible-bell t)
+(setq ring-bell-function 'fullybaked/flash-mode-line)
+
+#+END_SRC
+** Line-numbers
+
+I still like having line numbers around, and particularly relative line numbers.  So we'll set those up here, along with a custom function to togggle between relative (for me) and absolute (for pairing).
+
+First off, show them everywhere and set up some formatting so they look consistent.
+
+- Limit the height so different text sizes don't affect line numbers
+- Set the width to handle up to 3 digits
+- Always have the absolute line number displayed on the current line
+
+#+BEGIN_SRC emacs-lisp
+
+(setq-default display-line-numbers 'visual
+              display-line-numbers-current-absolute t
+              display-line-numbers-width 3)
+
+(eval-after-load "linum"
+  '(set-face-attribute 'linum nil :height 100))
+
+#+END_SRC
+
+Use =linum-relative= for relative numbering, and default to it.
+
+#+BEGIN_SRC emacs-lisp
+
+(use-package linum-relative
+  :config
+  (linum-relative-toggle))
+
+#+END_SRC
+
+Use C backend for relative numbering, better performance.
+
+#+BEGIN_SRC emacs-lisp
+
+(setq linum-relative-backend 'display-line-numbers-mode)
+
+#+END_SRC
+
+And finally, use =C-c n= to toggle between relative and absolute numbering.
+
+#+BEGIN_SRC emacs-lisp
+
+(defun fullybaked/line-numbers-absolute ()
+  "Display absolute line numbers using dispaly-line-numbers available in Emacs 26 and greater. Also switch off relative line numbers supplied by the linum-relative package"
+  (interactive)
+  (linum-relative-off)
+  (display-line-numbers-mode t))
+
+(defun fullybaked/line-numbers-relative ()
+  "Display relative line numbers using the linum-relative package, and turn off absolute line numbers"
+  (interactive)
+  (linum-relative-on)
+  (display-line-numbers-mode nil))
+
+(defvar line-number-state 0)
+(defun fullybaked/line-numbers-toggle ()
+  "Toggle between relative and absolute line numbers."
+  (interactive)
+  (cond
+    ((= line-number-state 0)
+      (fullybaked/line-numbers-absolute)
+      (setq line-number-state 1))
+    ((= line-number-state 1)
+      (fullybaked/line-numbers-relative)
+      (setq line-number-state 0))))
+
+(global-set-key (kbd "C-c n") 'fullybaked/line-numbers-toggle)
+
+#+END_SRC
+** Scroll conservatively
+
+When the point goes outside the window, Emacs tries to center it in the buffer. Let's not do that, instead only scroll as far as the point.
+
+#+BEGIN_SRC emacs-lisp
+
+(setq scroll-conservatively 100)
+
+#+END_SRC
+** Use =moody= for a prettier modeline
+
+#+BEGIN_SRC emacs-lisp
+
+(use-package moody
+  :config
+  (setq x-underline-at-descent-line t)
+  (setq moody-slant-function 'moody-slant-apple-rgb)
+  (moody-replace-mode-line-buffer-identification)
+  (moody-replace-vc-mode))
+
+#+END_SRC
+
+* Org Mode
+
+Org mode is one of the major draws Emacs had for me. Let's set it up for publishing and task management.
+
+  #+BEGIN_SRC emacs-lisp
+
+(use-package org)
+
+  #+END_SRC
+
+** Heading sizes
+
+Set up some heading sizes for the bullets. Only dealing with the first three headings as I rarely go more than three deep, and at that level the headings can be the same size.
+
+I only want the smallest of differences though, luckily Emacs can handle height precision to two decimal places.
+
+#+BEGIN_SRC emacs-lisp
+
+(set-face-attribute 'org-level-1 nil :height 1.2)
+(set-face-attribute 'org-level-2 nil :height 1.15)
+(set-face-attribute 'org-level-3 nil :height 1.1)
+
+#+END_SRC
+
+** Prettify lists
+
+Use nicer bullets in lists.
+
+#+BEGIN_SRC emacs-lisp
+
+(use-package org-bullets
+  :init
+  (add-hook 'org-mode-hook 'org-bullets-mode))
+
+#+END_SRC
+
+Use a little downward arrow instead of the ellipsis for expanding list items.
+
+#+BEGIN_SRC emacs-lisp
+
+(setq org-ellipsis " ⬎")
+
+#+END_SRC
+
+** Code blocks
+
+Use syntax highlighting when editing in code blocks
+
+#+BEGIN_SRC emacs-lisp
+
+(setq org-src-fontify-natively t)
+
+#+END_SRC
+
+When editing the code block, use the current window instead of opening a new one.
+
+#+BEGIN_SRC emacs-lisp
+
+(setq org-src-window-setup 'current-window)
+
+#+END_SRC
+
+Add an Org mode templace for =emacs-lisp= code blocks, as I predominantly use Org mode for my Emacs configuration. Map this to =<el= for super quick code blocks.
+
+#+BEGIN_SRC emacs-lisp
+
+(add-to-list 'org-structure-template-alist
+  '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC"))
+
+#+END_SRC
+
+** Task lists
+
+Store tasks in the =.emacs.d= directory
+
+#+BEGIN_SRC emacs-lisp
+
+(setq org-directory "~/.emacs.d/org")
+
+(defun org-file-path (filename)
+  "Return the absolute address of an org file, given its relative name."
+  (concat (file-name-as-directory org-directory) filename))
+
+(setq org-inbox-file (org-file-path "inbox.org"))
+(setq org-index-file (org-file-path "index.org"))
+(setq org-archive-location
+      (concat (org-file-path "archive.org") "::* From %s"))
+
+#+END_SRC
+
+Derive the agenda from the index file
+
+#+BEGIN_SRC emacs-lisp
+
+(setq org-agenda-files (list org-index-file))
+
+#+END_SRC
+
+Hitting =C-c C-x C-s= marks the task as done and moves to archive.
+
+#+BEGIN_SRC emacs-lisp
+
+(defun fullybaked/mark-done-and-archive ()
+  "Mark the state of an org-mode item as DONE and archive it."
+  (interactive)
+  (org-todo 'done)
+  (org-archive-subtree))
+
+(define-key org-mode-map (kbd "C-c C-x C-s") 'fullybaked/mark-done-and-archive)
+
+#+END_SRC
+
+Record when the task was archived.
+
+#+BEGIN_SRC emacs-lisp
+
+(setq org-log-done 'time)
+
+#+END_SRC
+
+*** Capture Templates
+
+Define a few common tasks as capture templates.
+
+#+BEGIN_SRC emacs-lisp
+(setq org-capture-templates
+      '(("t" "Todo"
+         entry
+         (file+headline org-index-file "Inbox")
+         "* TODO %?\n")))
+#+END_SRC
+
+*** Keybindings
+
+A few handy keys
+
+#+BEGIN_SRC emacs-lisp
+
+(define-key global-map "\C-cl" 'org-store-link)
+(define-key global-map "\C-ca" 'org-agenda)
+(define-key global-map "\C-cc" 'org-capture)
+
+#+END_SRC
+
+Quickly open the task list
+
+#+BEGIN_SRC emacs-lisp
+
+(defun fullybaked/open-index-file ()
+  "Open the master org TODO list."
+  (interactive)
+  (find-file org-index-file)
+  (end-of-buffer))
+
+#+END_SRC
+
+Use =M-n= to capture a new task
+
+#+BEGIN_SRC emacs-lisp
+
+(defun org-capture-todo ()
+  (interactive)
+  (org-capture :keys "t"))
+
+(global-set-key (kbd "M-n") 'org-capture-todo)
+
+#+END_SRC
+
+** Export to HTML
+
+#+BEGIN_SRC emacs-lisp
+
+(use-package htmlize)
+
+#+END_SRC
+
+** Export to Twitter Bootstrap formatted HTML
+
+#+BEGIN_SRC emacs-lisp
+
+(use-package ox-twbs)
+
+#+END_SRC
+
+* Project Management
+** Git with =magit=
+
+   #+BEGIN_SRC emacs-lisp
+
+(use-package magit
+  :bind
+  ("C-x g" . magit-status)
+
+  :config
+  (use-package with-editor)
+  (setq magit-push-always-verify nil)
+  (setq git-commit-summary-max-length 50))
+
+   #+END_SRC
+
+** Projectile
+
+#+BEGIN_SRC emacs-lisp
+
+(use-package projectile
+  :bind
+  ("C-c v" . 'projectile-ag)
+
+  :config
+  (define-key projectile-mode-map (kbd "C-f") 'projectile-find-file)
+
+  (setq projectile-completion-system 'ivy)
+  (setq projectile-switch-project-action 'projectile-dired)
+  (setq projectile-require-project-root nil))
+
+#+END_SRC
+
+Use projectile everywhere
+
+#+BEGIN_SRC emacs-lisp
+
+(projectile-global-mode)
+
+#+END_SRC
+
+* Utility functions
+
+Some handy functions for various tasks in the rest of my configuration or just general use.
+
+** Deal with the =#= symbol on macOS
+
+macOS uses =Meta-3= to insert the =#= symbol, but Emacs doesn't support that out the box, at least on a UK macOS setup.  This method adds that functionality.
+
+#+BEGIN_SRC emacs-lisp
+
+(defun fullybaked/insert-hash ()
+  "Insert a pound/hash symbol into the buffer."
+  (insert "#"))
+(global-set-key (kbd "M-3") '(lambda()(interactive)(fullybaked/insert-hash)))
+
+#+END_SRC
+
+** Add to auto-mode-list
+
+Stolen from Harry Schwartz config, but super useful for adding filetypes to the mode list.
+
+#+BEGIN_SRC emacs-lisp
+
+(defun fullybaked/add-auto-mode (mode &rest patterns)
+  "Add entries to `auto-mode-alist' to use `MODE' for all given file `PATTERNS'."
+  (dolist (pattern patterns)
+    (add-to-list 'auto-mode-alist (cons pattern mode))))
+
+#+END_SRC
+
+* Configure =ivy= and =counsel=
+
+#+BEGIN_SRC emacs-lisp
+
+(use-package counsel
+  :bind
+  ("M-x" . 'counsel-M-x)
+  ("C-s" . 'swiper)
+
+  :config
+  (use-package flx)
+  (use-package smex)
+
+  (ivy-mode 1)
+  (setq ivy-use-virtual-buffers t)
+  (setq ivy-count-format "(%d/%d) ")
+  (setq ivy-initial-inputs-alist nil)
+  (setq ivy-re-builders-alist
+        '((swiper . ivy--regex-plus)
+          (t . ivy--regex-fuzzy))))
+
+#+END_SRC
+
+* Splitting and rebalancing panes
+
+Override the Emacs default for splitting windows so that we always re-balance the windows to be equal sizes in the available space.
+
+Also I nearly always want to use the new split first, so lets get the active cursor-point over there.
+
+#+BEGIN_SRC emacs-lisp
+
+(defun fullybaked/split-window-below-and-switch ()
+  "Split the window horizontally, then switch to the new pane."
+  (interactive)
+  (split-window-below)
+  (balance-windows)
+  (other-window 1))
+
+(defun fullybaked/split-window-right-and-switch ()
+  "Split the window vertically, then switch to the new pane."
+  (interactive)
+  (split-window-right)
+  (balance-windows)
+  (other-window 1))
+
+(global-set-key (kbd "C-x 2") 'fullybaked/split-window-below-and-switch)
+(global-set-key (kbd "C-x 3") 'fullybaked/split-window-right-and-switch)
+
+#+END_SRC
+
+* Use =which-key=
+
+Type the first part of a key chord and =which-key= will show all the possible keys/chords that can follow, along with the function to which they are mapped.
+
+#+BEGIN_SRC emacs-lisp
+
+(use-package which-key
+  :config (which-key-mode))
+
+#+END_SRC
+
+* Resources
+
+List of the resources I used as I learned about Emacs and how this config file was put together.
+
+[[https://github.com/aaronbieber/dotfiles/blob/master/configs/emacs.d/][Aaron Beiber dotfiles]]
+
+[[https://www.youtube.com/watch?v=JWD1Fpdd4Pc][Aaron Beiber - How to stop worrying and love Emacs]]
+
+[[https://www.youtube.com/watch?v=SzA2YODtgK4][Harry Schwartz - Getting started with Org mode]]
+
+[[https://github.com/hrs/dotfiles/blob/master/emacs/.emacs.d/][Harry Schwartz - Emacs config]]
+
+[[https://thoughtbot.com/upcase/videos/emacs-intro][Thoughtbot Upcase - Intro to Emacs]]
+
+[[http://rawsyntax.com/blog/learn-emacs-zsh-and-multi-term/][Setting up ZSH in Emacs multi-term]]
+
+[[https://worace.works/2016/06/07/getting-started-with-emacs-for-ruby/][Emacs as a Ruby IDE]]
+
+[[https://github.com/angrybacon/dotemacs/blob/master/dotemacs.org][AngryBacon - DotEmacs config]]
+
+[[https://sam217pa.github.io/2016/09/23/keybindings-strategies-in-emacs/][Samuel Barreto - Keybinding Stategies in Emacs]]

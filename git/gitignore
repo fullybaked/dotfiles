@@ -4,5 +4,7 @@ auto-save-list/*
 .DS_Store
 .ruby-version
 tags
+tags.temp
+tags.lock
 .notes
 .rubocop.yml
