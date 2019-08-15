@@ -64,6 +64,7 @@ inoremap <expr> <C-x><C-r> fzf#complete({
 fun! SetMyAssertions()
     syn match myAssertions /\%(assert_valid\)\|\%(refute_valid\)/
     syn match myAssertions /\%(assert_unsorted_results\)/
+    syn match myAssertions /\%(assert_css\)\|\%(assert_no_css\)/
     hi link myAssertions rubyAssertion
 endfu
 autocmd bufenter * :call SetMyAssertions()
