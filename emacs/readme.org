@@ -578,6 +578,15 @@ Use =M-n= to capture a new task
 Some handy functions for various tasks in the rest of my configuration or just general use.
 
 #+BEGIN_SRC emacs-lisp
+(defun fullybaked/comment-or-uncomment-region-or-line ()
+  "Comments or uncomments the region or the current line if there's no active region."
+  (interactive)
+  (let (beg end)
+    (if (region-active-p)
+        (setq beg (region-beginning) end (region-end))
+      (setq beg (line-beginning-position) end (line-end-position)))
+    (comment-or-uncomment-region beg end)))
+
 (defun fullybaked/switch-to-previous-buffer ()
   "Switch to previously open buffer. Repeated invocations toggle between the two most recently open buffers."
   (interactive)
@@ -631,6 +640,17 @@ Use =evil=
     (evil-mode 1))
 #+END_SRC
 
+Configure =C-u= to be Vim-like instead of the Emacs prefix.  These keybindings try to mimic the Vim version, which is to page up in normal and visual, and to delete to the previous indent if in insert.
+
+#+BEGIN_SRC emacs-lisp
+(define-key evil-normal-state-map (kbd "C-u") 'evil-scroll-up)
+(define-key evil-visual-state-map (kbd "C-u") 'evil-scroll-up)
+(define-key evil-insert-state-map (kbd "C-u")
+  (lambda ()
+    (interactive)
+    (evil-delete (point-at-bol) (point))))
+#+END_SRC
+
 Enable surround everywhere.
 
 #+BEGIN_SRC emacs-lisp
@@ -652,13 +672,13 @@ Use evil with Org agendas.
   (evil-org-agenda-set-keys))
 #+END_SRC
 
-Use =evil-escape= and bind it to =jj= as that's how my Vim config is set up, so muscle memory is strong. As per the docs, set the timeout to 0.2s when using the same key twice.
+Use =evil-escape= and bind it to =jk=.
 
 #+BEGIN_SRC emacs-lisp
 (use-package evil-escape
   :config
-  (setq-default evil-escape-key-sequence "jj")
-  (setq-default evil-escape-delay 0.2)
+  (setq-default evil-escape-key-sequence "jk")
+  (setq-default evil-escape-delay 0.1)
   (evil-escape-mode))
 #+END_SRC
 
@@ -887,6 +907,12 @@ Global keybindings under <Leader> key
   :keymaps 'normal
   "SPC" 'fullybaked/switch-to-previous-buffer
   "gs" 'magit-status
+  "b" 'counsel-switch-buffer
+  "\\" 'fullybaked/split-window-right-and-switch
+  "-" 'fullybaked/split-window-below-and-switch
+  "tf" 'fullybaked/run-rails-test-file
+  "tn" 'fullybaked/run-rails-test-at-point
+  "gc" 'fullybaked/comment-or-uncomment-region-or-line
 )
 #+END_SRC
 
@@ -901,18 +927,52 @@ Set up leader keys to jump between headlines in Org-mode, <Leader>p and <Leader>
 )'normal
 #+END_SRC
 * Custom keybindings
-Set up some custom keybindings to mimic some of the movements I'm used to in Vim, for buffers that don't load Evil-mode.
 
 #+BEGIN_SRC emacs-lisp
 (global-set-key (kbd "s-j") 'forward-paragraph)
 (global-set-key (kbd "s-k") 'backward-paragraph)
-#+END_SRC
 
-A couple of handy functions
-
-#+BEGIN_SRC emacs-lisp
 (global-set-key (kbd "C-w") 'backward-kill-word)
 (global-set-key (kbd "M-o") 'other-window)
+#+END_SRC
+
+* Terminal setup
+Use =multi-term= to manage shell sessions and bind it to =C-c t=
+
+#+BEGIN_SRC emacs-lisp
+(use-package multi-term)
+(global-set-key (kbd "C-c t") 'multi-term)
+#+END_SRC
+
+Use =zsh= for the shell
+
+#+BEGIN_SRC emacs-lisp
+(setq multi-term-program-switches "--login")
+#+END_SRC
+
+Let's not use Evil mode on the terminal. I don't use the vi bindings normally, so won't use them in Emacs-Terminal either.
+
+#+BEGIN_SRC emacs-lisp
+(evil-set-initial-state 'term-mode 'emacs)
+#+END_SRC
+
+- Fix pasting in the terminal.  Yanking in =term-mode= doesn't quite work, the text appears in the buffer but isn't sent to the shell. Correctly bind =C-y= to yank how we'd expect.
+- Bind =M-o= to switch to the other window
+- Turn off =yasnippet= as I want the shell to do it's own tab-completion
+
+#+BEGIN_SRC emacs-lisp
+(defun fullybaked/term-paste (&optional string)
+  (interactive)
+  (process-send-string
+   (get-buffer-process (current-buffer))
+   (if string string (current-kill 0))))
+
+(add-hook 'term-mode-hook
+          (lambda ()
+            (goto-address-mode)
+            (define-key term-raw-map (kbd "C-y") 'fullybaked/term-paste)
+            (define-key term-raw-map (kbd "M-o") 'other-window)
+            (setq yas-dont-activate t)))
 #+END_SRC
 
 * Languages
@@ -926,15 +986,6 @@ I use =rbenv= to manage my local Ruby and RubyGems so lets configure Emacs to kn
   (global-rbenv-mode)
   (rbenv-use-global))
 
-#+END_SRC
-
-Evaluate Ruby code straight in the buffer with a hash-rocket using =rcodetools= and =xmp=
-
-#+BEGIN_SRC emacs-lisp
-(add-to-list 'load-path "~/.rbenv/versions/2.6.2/lib/ruby/gems/2.6.0/gems/rcodetools-0.8.5.0")
-(setq xmpfilter-command-name
-      "ruby -S xmpfilter --no-warnings --dev --fork --detect-rbtest")
-(require 'rcodetools)
 #+END_SRC
 
 Running tests from within Emacs is awesome, but...
@@ -962,15 +1013,6 @@ the =ruby-test-mode= doesn't take into account newer versions a Rails so,
         (compile (format "bundle exec rails test %s:%s" filename line))))
     )
   )
-#+END_SRC
-
-Override the =ruby-test-mode= keybindings to use the methods above
-
-#+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "C-c C-t n")   'fullybaked/run-rails-test-file)
-(global-set-key (kbd "C-c C-t C-n") 'fullybaked/run-rails-test-file)
-(global-set-key (kbd "C-c C-t t")   'fullybaked/run-rails-test-at-point)
-(global-set-key (kbd "C-c C-t C-t") 'fullybaked/run-rails-test-at-point)
 #+END_SRC
 
 Use =projectile-rails= for some helpers
