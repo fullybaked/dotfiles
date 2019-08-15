@@ -45,10 +45,10 @@ Merge Emacs registers and OS clipboard for smoother cut/copy/paste experience
 (setq-default select-enable-clipboard t)
 #+END_SRC
 
-Display trailing whitespace everywhere, and get rid of it when we save the file
+I don't want to see trailing whitespace, but I /do/ want to delete it when I save a file.
 
 #+BEGIN_SRC emacs-lisp
-(setq-default show-trailing-whitespace t)
+(setq-default show-trailing-whitespace nil)
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 #+END_SRC
 
@@ -67,16 +67,16 @@ Always focus in help windows when they are opened as I'll most likely want to na
 (setq-default help-window-select t)
 #+END_SRC
 
+Indicate matching parens
+
+#+BEGIN_SRC emacs-lisp
+(show-paren-mode t)
+#+END_SRC
+
 No delay on showing matching parens
 
 #+BEGIN_SRC emacs-lisp
 (setq-default show-paren-delay 0.0)
-#+END_SRC
-
-Show file sizes in human readable formats in Dired
-
-#+BEGIN_SRC emacs-lisp
-(setq-default dired-listing-switches "-alh")
 #+END_SRC
 
 Follow symlinks when opening files
@@ -101,12 +101,6 @@ Default to =utf-8= encodings
 
 #+BEGIN_SRC emacs-lisp
 (set-default-coding-systems 'utf-8)
-#+END_SRC
-
-Indicate matching parens
-
-#+BEGIN_SRC emacs-lisp
-(show-paren-mode t)
 #+END_SRC
 
 If a file is updated outside of Emacs while open in Emacs, make sure it reloads so content is always current.
@@ -137,6 +131,12 @@ Enable =delete-selection-mode= which makes Emacs behave more like /other/ editor
 
 #+BEGIN_SRC emacs-lisp
 (delete-selection-mode t)
+#+END_SRC
+
+Ensure Emacs opens any URL's in the default browser
+
+#+BEGIN_SRC emacs-lisp
+(setq-default browse-url-browser-function 'browse-url-default-macosx-browser)
 #+END_SRC
 
 * Setup =use-package=
@@ -227,7 +227,7 @@ Active Gruvbox by default
 
 #+BEGIN_SRC emacs-lisp
 
-(load-theme 'gruvbox-dark-soft t)
+(load-theme 'gruvbox-dark-hard t)
 
 #+END_SRC
 
@@ -383,30 +383,25 @@ When the point goes outside the window, Emacs tries to center it in the buffer. 
   (moody-replace-vc-mode))
 
 #+END_SRC
-
 * Org Mode
+** Initialise Org mode
+   Org mode is one of the major draws Emacs had for me. Let's set it up for publishing and task management.
 
-Org mode is one of the major draws Emacs had for me. Let's set it up for publishing and task management.
-
-  #+BEGIN_SRC emacs-lisp
-
-(use-package org)
-
-  #+END_SRC
+   #+BEGIN_SRC emacs-lisp
+   (use-package org)
+   #+END_SRC
 
 ** Heading sizes
 
-Set up some heading sizes for the bullets. Only dealing with the first three headings as I rarely go more than three deep, and at that level the headings can be the same size.
+   Set up some heading sizes for the bullets. Only dealing with the first three headings as I rarely go more than three deep, and at that level the headings can be the same size.
 
-I only want the smallest of differences though, luckily Emacs can handle height precision to two decimal places.
+   I only want the smallest of differences though, luckily Emacs can handle height precision to two decimal places.
 
-#+BEGIN_SRC emacs-lisp
-
-(set-face-attribute 'org-level-1 nil :height 1.2)
-(set-face-attribute 'org-level-2 nil :height 1.15)
-(set-face-attribute 'org-level-3 nil :height 1.1)
-
-#+END_SRC
+   #+BEGIN_SRC emacs-lisp
+   (set-face-attribute 'org-level-1 nil :height 1.2)
+   (set-face-attribute 'org-level-2 nil :height 1.15)
+   (set-face-attribute 'org-level-3 nil :height 1.1)
+   #+END_SRC
 
 ** Prettify lists
 
@@ -454,55 +449,61 @@ Add an Org mode templace for =emacs-lisp= code blocks, as I predominantly use Or
   '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC"))
 
 #+END_SRC
-
 ** Task lists
+   Set up my task state list
 
-Store tasks in the =.emacs.d= directory
+   #+BEGIN_SRC emacs-lisp
+   (setq org-todo-keywords
+      '((sequence "TODO(t)" "WAIT(w)" "|" "DONE(d)" "CANCELED(c)")))
+   #+END_SRC
 
-#+BEGIN_SRC emacs-lisp
 
-(setq org-directory "~/.emacs.d/org")
+   Store tasks in the =.emacs.d= directory
 
-(defun org-file-path (filename)
-  "Return the absolute address of an org file, given its relative name."
-  (concat (file-name-as-directory org-directory) filename))
+   #+BEGIN_SRC emacs-lisp
 
-(setq org-inbox-file (org-file-path "inbox.org"))
-(setq org-index-file (org-file-path "index.org"))
-(setq org-archive-location
-      (concat (org-file-path "archive.org") "::* From %s"))
+   (setq org-directory "~/.emacs.d/org")
 
-#+END_SRC
+   (defun org-file-path (filename)
+     "Return the absolute address of an org file, given its relative name."
+     (concat (file-name-as-directory org-directory) filename))
 
-Derive the agenda from the index file
+   (setq org-inbox-file (org-file-path "inbox.org"))
+   (setq org-index-file (org-file-path "index.org"))
+   (setq org-archive-location
+         (concat (org-file-path "archive.org") "::* From %s"))
 
-#+BEGIN_SRC emacs-lisp
+   #+END_SRC
 
-(setq org-agenda-files (list org-index-file))
+   Derive the agenda from the index file
 
-#+END_SRC
+   #+BEGIN_SRC emacs-lisp
 
-Hitting =C-c C-x C-s= marks the task as done and moves to archive.
+   (setq org-agenda-files (list org-index-file))
 
-#+BEGIN_SRC emacs-lisp
+   #+END_SRC
 
-(defun fullybaked/mark-done-and-archive ()
-  "Mark the state of an org-mode item as DONE and archive it."
-  (interactive)
-  (org-todo 'done)
-  (org-archive-subtree))
+   Hitting =C-c C-x C-s= marks the task as done and moves to archive.
 
-(define-key org-mode-map (kbd "C-c C-x C-s") 'fullybaked/mark-done-and-archive)
+   #+BEGIN_SRC emacs-lisp
 
-#+END_SRC
+   (defun fullybaked/mark-done-and-archive ()
+     "Mark the state of an org-mode item as DONE and archive it."
+     (interactive)
+     (org-todo 'done)
+     (org-archive-subtree))
 
-Record when the task was archived.
+   (define-key org-mode-map (kbd "C-c C-x C-s") 'fullybaked/mark-done-and-archive)
 
-#+BEGIN_SRC emacs-lisp
+   #+END_SRC
 
-(setq org-log-done 'time)
+   Record when the task was archived.
 
-#+END_SRC
+   #+BEGIN_SRC emacs-lisp
+
+   (setq org-log-done 'time)
+
+   #+END_SRC
 
 *** Capture Templates
 
@@ -514,6 +515,12 @@ Define a few common tasks as capture templates.
          entry
          (file+headline org-index-file "Inbox")
          "* TODO %?\n")))
+#+END_SRC
+
+When starting an Org capture, I typically want to be in insert mode right off the bat, so let's do that.
+
+#+BEGIN_SRC emacs-lisp
+(add-hook 'org-capture-mode-hook 'evil-insert-state)
 #+END_SRC
 
 *** Keybindings
@@ -567,22 +574,232 @@ Use =M-n= to capture a new task
 (use-package ox-twbs)
 
 #+END_SRC
+* Utility functions
+Some handy functions for various tasks in the rest of my configuration or just general use.
 
-* Project Management
+#+BEGIN_SRC emacs-lisp
+(defun fullybaked/switch-to-previous-buffer ()
+  "Switch to previously open buffer. Repeated invocations toggle between the two most recently open buffers."
+  (interactive)
+  (switch-to-buffer (other-buffer (current-buffer) 1)))
+
+(defun fullybaked/insert-hash ()
+  "Insert a pound/hash symbol into the buffer on Meta-3 keypress. Emacs on macOS doesn't always support this, at least on UK keyboards"
+  (insert "#"))
+(global-set-key (kbd "M-3") '(lambda()(interactive)(fullybaked/insert-hash)))
+
+(defun fullybaked/add-auto-mode (mode &rest patterns)
+  "Add entries to `auto-mode-alist' to use `MODE' for all given file `PATTERNS'."
+  (dolist (pattern patterns)
+    (add-to-list 'auto-mode-alist (cons pattern mode))))
+
+(defun fullybaked/append-to-path (path)
+  "Add a path both to the $PATH variable and to Emacs' exec-path."
+  (setenv "PATH" (concat (getenv "PATH") ":" path))
+  (add-to-list 'exec-path path))
+
+(defun fullybaked/visit-last-migration ()
+  "Open the most recent Rails migration. Relies on projectile."
+  (interactive)
+  (let ((migrations
+         (directory-files
+          (expand-file-name "db/migrate" (projectile-project-root)) t)))
+    (find-file (car (last migrations)))))
+
+(defun fullybaked/rename-file (new-name)
+  (interactive "FNew name: ")
+  (let ((filename (buffer-file-name)))
+    (if filename
+        (progn
+          (when (buffer-modified-p)
+             (save-buffer))
+          (rename-file filename new-name t)
+          (kill-buffer (current-buffer))
+          (find-file new-name)
+          (message "Renamed '%s' -> '%s'" filename new-name))
+      (message "Buffer '%s' isn't backed by a file!" (buffer-name)))))
+
+#+END_SRC
+
+* Features
+** Vim using =Evil=
+Use =evil=
+
+#+BEGIN_SRC emacs-lisp
+(use-package evil
+    :config
+    (evil-mode 1))
+#+END_SRC
+
+Enable surround everywhere.
+
+#+BEGIN_SRC emacs-lisp
+(use-package evil-surround
+  :config
+  (global-evil-surround-mode 1))
+#+END_SRC
+
+Use evil with Org agendas.
+
+#+BEGIN_SRC emacs-lisp
+(use-package evil-org
+  :after org
+  :config
+  (add-hook 'org-mode-hook 'evil-org-mode)
+  (add-hook 'evil-org-mode-hook
+            (lambda () (evil-org-set-key-theme)))
+  (require 'evil-org-agenda)
+  (evil-org-agenda-set-keys))
+#+END_SRC
+
+Use =evil-escape= and bind it to =jj= as that's how my Vim config is set up, so muscle memory is strong. As per the docs, set the timeout to 0.2s when using the same key twice.
+
+#+BEGIN_SRC emacs-lisp
+(use-package evil-escape
+  :config
+  (setq-default evil-escape-key-sequence "jj")
+  (setq-default evil-escape-delay 0.2)
+  (evil-escape-mode))
+#+END_SRC
+
+** Configure =ivy= and =counsel=
+
+ #+BEGIN_SRC emacs-lisp
+
+ (use-package counsel
+   :bind
+   ("M-x" . 'counsel-M-x)
+   ("C-s" . 'swiper)
+
+   :config
+   (use-package flx)
+   (use-package smex)
+
+   (ivy-mode 1)
+   (setq ivy-use-virtual-buffers t)
+   (setq ivy-count-format "(%d/%d) ")
+   (setq ivy-initial-inputs-alist nil)
+   (setq ivy-re-builders-alist
+         '((swiper . ivy--regex-plus)
+           (t . ivy--regex-fuzzy))))
+
+ #+END_SRC
+** Auto-complete
+
+Let's set up =company= for auto-completion
+
+ #+BEGIN_SRC emacs-lisp
+
+(use-package company
+  :bind
+  (:map company-active-map
+        ("RET" . nil)
+        ([return] . nil)
+        ("TAB" . company-complete-selection)
+        ([tab] . company-complete-selection)
+        ("<right>" . company-complete-common))
+  :hook
+  (after-init . global-company-mode))
+
+ #+END_SRC
+
+** Splitting and rebalancing panes
+
+ Override the Emacs default for splitting windows so that we always re-balance the windows to be equal sizes in the available space.
+
+ Also I nearly always want to use the new split first, so lets get the active cursor-point over there.
+
+ #+BEGIN_SRC emacs-lisp
+
+ (defun fullybaked/split-window-below-and-switch ()
+   "Split the window horizontally, then switch to the new pane."
+   (interactive)
+   (split-window-below)
+   (balance-windows)
+   (other-window 1))
+
+ (defun fullybaked/split-window-right-and-switch ()
+   "Split the window vertically, then switch to the new pane."
+   (interactive)
+   (split-window-right)
+   (balance-windows)
+   (other-window 1))
+
+ (global-set-key (kbd "C-x 2") 'fullybaked/split-window-below-and-switch)
+ (global-set-key (kbd "C-x 3") 'fullybaked/split-window-right-and-switch)
+
+ (global-set-key (kbd "C-c l") 'windmove-right)
+ (global-set-key (kbd "C-c h") 'windmove-left)
+ (global-set-key (kbd "C-c k") 'windmove-up)
+ (global-set-key (kbd "C-c j") 'windmove-down)
+ (global-set-key (kbd "C-c =") 'balance-windows)
+
+ #+END_SRC
+
+** Use =which-key=
+
+ Type the first part of a key chord and =which-key= will show all the possible keys/chords that can follow, along with the function to which they are mapped.
+
+ #+BEGIN_SRC emacs-lisp
+
+ (use-package which-key
+   :config (which-key-mode))
+
+ #+END_SRC
+
+** Use =flycheck= for linting
+
+ #+BEGIN_SRC emacs-lisp
+(use-package flycheck
+  :hook
+  ((css-mode . flycheck-mode)
+   (emacs-lisp-mode . flycheck-mode)
+   (js-mode . flycheck-mode)
+   (ruby-mode . flycheck-mode))
+  :custom
+  (flycheck-check-syntax-automatically '(save mode-enabled))
+  (flycheck-disabled-checkers '(emacs-lisp-checkdoc))
+  (flycheck-display-errors-delay .3))
+
+ #+END_SRC
+
 ** Git with =magit=
 
-   #+BEGIN_SRC emacs-lisp
+Use =magit= to handle all Git things, because it's freakin awesome
 
+#+BEGIN_SRC emacs-lisp
 (use-package magit
   :bind
   ("C-x g" . magit-status)
 
   :config
+  (use-package evil-magit)
   (use-package with-editor)
   (setq magit-push-always-verify nil)
-  (setq git-commit-summary-max-length 50))
+  (setq git-commit-summary-max-length 50)
 
-   #+END_SRC
+  (add-hook 'with-editor-mode-hook 'evil-insert-state))
+#+END_SRC
+
+Open the current branches PR on Github
+
+#+BEGIN_SRC emacs-lisp
+(defun fullybaked/visit-pull-request-url ()
+  "Visit the current branch's PR on Github."
+  (interactive)
+  (browse-url
+   (format "https://github.com/%s/pull/new/%s"
+           (replace-regexp-in-string
+            "\\`.+github\\.com:\\(.+\\)\\.git\\'" "\\1"
+            (magit-get "remote"
+                       (magit-get-push-remote)
+                       "url"))
+           (magit-get-current-branch))))
+
+(eval-after-load 'magit
+  '(define-key magit-mode-map "v"
+     #'fullybaked/visit-pull-request-url))
+#+END_SRC
 
 ** Projectile
 
@@ -593,7 +810,9 @@ Use =M-n= to capture a new task
   ("C-c v" . 'projectile-ag)
 
   :config
-  (define-key projectile-mode-map (kbd "C-f") 'projectile-find-file)
+  (define-key evil-normal-state-map (kbd "C-p") 'projectile-find-file)
+  (evil-define-key 'motion ag-mode-map (kbd "C-p") 'projectile-find-file)
+  (evil-define-key 'motion rspec-mode-map (kbd "C-p") 'projectile-find-file)
 
   (setq projectile-completion-system 'ivy)
   (setq projectile-switch-project-action 'projectile-dired)
@@ -608,96 +827,259 @@ Use projectile everywhere
 (projectile-global-mode)
 
 #+END_SRC
-
-* Utility functions
-
-Some handy functions for various tasks in the rest of my configuration or just general use.
-
-** Deal with the =#= symbol on macOS
-
-macOS uses =Meta-3= to insert the =#= symbol, but Emacs doesn't support that out the box, at least on a UK macOS setup.  This method adds that functionality.
+** Directories with =dired=
+   Hide dotfiles by default, toggle them with =.=
 
 #+BEGIN_SRC emacs-lisp
-
-(defun fullybaked/insert-hash ()
-  "Insert a pound/hash symbol into the buffer."
-  (insert "#"))
-(global-set-key (kbd "M-3") '(lambda()(interactive)(fullybaked/insert-hash)))
-
-#+END_SRC
-
-** Add to auto-mode-list
-
-Stolen from Harry Schwartz config, but super useful for adding filetypes to the mode list.
-
-#+BEGIN_SRC emacs-lisp
-
-(defun fullybaked/add-auto-mode (mode &rest patterns)
-  "Add entries to `auto-mode-alist' to use `MODE' for all given file `PATTERNS'."
-  (dolist (pattern patterns)
-    (add-to-list 'auto-mode-alist (cons pattern mode))))
-
-#+END_SRC
-
-* Configure =ivy= and =counsel=
-
-#+BEGIN_SRC emacs-lisp
-
-(use-package counsel
-  :bind
-  ("M-x" . 'counsel-M-x)
-  ("C-s" . 'swiper)
-
+(use-package dired-hide-dotfiles
   :config
-  (use-package flx)
-  (use-package smex)
-
-  (ivy-mode 1)
-  (setq ivy-use-virtual-buffers t)
-  (setq ivy-count-format "(%d/%d) ")
-  (setq ivy-initial-inputs-alist nil)
-  (setq ivy-re-builders-alist
-        '((swiper . ivy--regex-plus)
-          (t . ivy--regex-fuzzy))))
-
+  (dired-hide-dotfiles-mode)
+  (define-key dired-mode-map "." 'dired-hide-dotfiles-mode))
 #+END_SRC
 
-* Splitting and rebalancing panes
+Show file sizes in human readable formats in Dired
 
-Override the Emacs default for splitting windows so that we always re-balance the windows to be equal sizes in the available space.
+#+BEGIN_SRC emacs-lisp
+(setq-default dired-listing-switches "-alh")
+#+END_SRC
 
-Also I nearly always want to use the new split first, so lets get the active cursor-point over there.
+Use =j= and =k= to move around in =dired=
+
+#+BEGIN_SRC emacs-lisp
+(evil-define-key 'normal dired-mode-map (kbd "j") 'dired-next-line)
+(evil-define-key 'normal dired-mode-map (kbd "k") 'dired-previous-line)
+#+END_SRC
+
+** Snippets with =yasnippet=
+#+BEGIN_SRC emacs-lisp
+(use-package yasnippet)
+#+END_SRC
+
+Locate snippet files in =~/.emacs/snippets/text-mode=, but this /should/ be symlinked in from the dotfiles repo. Then enabled it globally.  It can be turned off in the places I don't want it.
+
+#+BEGIN_SRC emacs-lisp
+(setq yas-snippet-dirs '("~/.emacs.d/snippets/text-mode"))
+(yas-global-mode 1)
+#+END_SRC
+
+Don't let =yasnippet= try to indent the snippet, this can go wrong in some situations.
+
+#+BEGIN_SRC emacs-lisp
+(setq yas/indent-line nil)
+#+END_SRC
+* Keybindings with =General=
+Use =general= to handle complex/custom keybindings. Especially handy with =Evil= stuff, like setting a leader key.
+
+#+BEGIN_SRC emacs-lisp
+(use-package general)
+#+END_SRC
+
+Set up =SPC= as the leader key
+
+#+BEGIN_SRC emacs-lisp
+(general-create-definer my-leader-def :prefix "SPC")
+#+END_SRC
+
+Global keybindings under <Leader> key
+
+#+BEGIN_SRC emacs-lisp
+(my-leader-def
+  :keymaps 'normal
+  "SPC" 'fullybaked/switch-to-previous-buffer
+  "gs" 'magit-status
+)
+#+END_SRC
+
+Set up leader keys to jump between headlines in Org-mode, <Leader>p and <Leader>n to jump (p)revious and (n)ext headlines
+
+#+BEGIN_SRC emacs-lisp
+(my-leader-def
+  :states 'normal
+  :keymaps 'org-mode-map
+  "p" 'org-previous-visible-heading
+  "n" 'org-next-visible-heading
+)'normal
+#+END_SRC
+* Custom keybindings
+Set up some custom keybindings to mimic some of the movements I'm used to in Vim, for buffers that don't load Evil-mode.
+
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "s-j") 'forward-paragraph)
+(global-set-key (kbd "s-k") 'backward-paragraph)
+#+END_SRC
+
+A couple of handy functions
+
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "C-w") 'backward-kill-word)
+(global-set-key (kbd "M-o") 'other-window)
+#+END_SRC
+
+* Languages
+** Ruby
+I use =rbenv= to manage my local Ruby and RubyGems so lets configure Emacs to know about it.
 
 #+BEGIN_SRC emacs-lisp
 
-(defun fullybaked/split-window-below-and-switch ()
-  "Split the window horizontally, then switch to the new pane."
-  (interactive)
-  (split-window-below)
-  (balance-windows)
-  (other-window 1))
-
-(defun fullybaked/split-window-right-and-switch ()
-  "Split the window vertically, then switch to the new pane."
-  (interactive)
-  (split-window-right)
-  (balance-windows)
-  (other-window 1))
-
-(global-set-key (kbd "C-x 2") 'fullybaked/split-window-below-and-switch)
-(global-set-key (kbd "C-x 3") 'fullybaked/split-window-right-and-switch)
+(use-package rbenv
+  :config
+  (global-rbenv-mode)
+  (rbenv-use-global))
 
 #+END_SRC
 
-* Use =which-key=
-
-Type the first part of a key chord and =which-key= will show all the possible keys/chords that can follow, along with the function to which they are mapped.
+Evaluate Ruby code straight in the buffer with a hash-rocket using =rcodetools= and =xmp=
 
 #+BEGIN_SRC emacs-lisp
+(add-to-list 'load-path "~/.rbenv/versions/2.6.2/lib/ruby/gems/2.6.0/gems/rcodetools-0.8.5.0")
+(setq xmpfilter-command-name
+      "ruby -S xmpfilter --no-warnings --dev --fork --detect-rbtest")
+(require 'rcodetools)
+#+END_SRC
 
-(use-package which-key
-  :config (which-key-mode))
+Running tests from within Emacs is awesome, but...
 
+#+BEGIN_SRC emacs-lisp
+(use-package ruby-test-mode)
+#+END_SRC
+
+the =ruby-test-mode= doesn't take into account newer versions a Rails so,
+
+#+BEGIN_SRC emacs-lisp
+(defun fullybaked/run-rails-test-file()
+  "Run current test file through the rails command"
+  (interactive)
+  (let ((filename (ruby-test-find-file)))
+    (compile (format "bundle exec rails test %s" filename))))
+
+(defun run-rails-test-at-point ()
+  "Run the closest test to the line number of the point, don't use a regex to guess the name, just pass the rails command the actual line number"
+  (interactive)
+  (let* ((filename (ruby-test-find-file))
+         (buffername (get-file-buffer filename)))
+    (with-current-buffer buffername
+      (let ((line (line-number-at-pos (point))))
+        (compile (format "bundle exec rails test %s:%s" filename line))))
+    )
+  )
+#+END_SRC
+
+Override the =ruby-test-mode= keybindings to use the methods above
+
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "C-c C-t n")   'fullybaked/run-rails-test-file)
+(global-set-key (kbd "C-c C-t C-n") 'fullybaked/run-rails-test-file)
+(global-set-key (kbd "C-c C-t t")   'fullybaked/run-rails-test-at-point)
+(global-set-key (kbd "C-c C-t C-t") 'fullybaked/run-rails-test-at-point)
+#+END_SRC
+
+Use =projectile-rails= for some helpers
+
+- =C-c r m/c/v= open model/controller/view
+
+#+BEGIN_SRC emacs-lisp
+(use-package projectile-rails
+  :config
+  (projectile-rails-global-mode))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(add-hook 'ruby-mode-hook
+          (lambda ()
+            (setq ruby-insert-encoding-magic-comment nil)
+            (ruby-test-mode)
+            (flycheck-mode)
+            (local-set-key "\r" 'newline-and-indent)
+            (define-key ruby-mode-map (kbd "C-c C-c") 'xmp)))
+#+END_SRC
+
+Associate Ruby with certain files that don't typically have a =rb= extension
+
+#+BEGIN_SRC emacs-lisp
+(fullybaked/add-auto-mode
+ 'ruby-mode
+ "\\Gemfile$"
+ "\\.rake$"
+ "\\.gemspec$"
+ "\\Guardfile$"
+ "\\Rakefile$")
+#+END_SRC
+** Web Mode
+#+BEGIN_SRC emacs-lisp
+(use-package web-mode)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(add-hook 'web-mode-hook
+          (lambda ()
+            (rainbow-mode)
+            (ruby-test-mode)
+            (setq web-mode-markup-indent-offset 2)))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(fullybaked/add-auto-mode
+ 'web-mode
+ "\\.erb$"
+ "\\.html$")
+#+END_SRC
+** CSS / SASS
+Indent by 2 paces
+
+#+BEGIN_SRC emacs-lisp
+(use-package css-mode
+  :config
+  (setq css-indent-offset 2))
+#+END_SRC
+
+Don't compile SCSS on save
+
+#+BEGIN_SRC emacs-lisp
+(use-package scss-mode
+  :config
+  (setq scss-compile-at-save nil))
+#+END_SRC
+** Javascript
+Indent by 2 spaces
+
+#+BEGIN_SRC emacs-lisp
+(setq js-indent-level 2)
+#+END_SRC
+** Lisp
+Balance parens
+
+#+BEGIN_SRC emacs-lisp
+(use-package paredit)
+#+END_SRC
+
+Colourise matching parens
+
+#+BEGIN_SRC emacs-lisp
+(use-package rainbow-delimiters)
+#+END_SRC
+
+All the lisps have some shared features, so we want to do the same things for all of them. That includes using paredit, rainbow-delimiters, and highlighting the whole expression when point is on a parenthesis.
+
+#+BEGIN_SRC emacs-lisp
+(setq lispy-mode-hooks
+      '(clojure-mode-hook
+        emacs-lisp-mode-hook
+        lisp-mode-hook
+        scheme-mode-hook))
+
+(dolist (hook lispy-mode-hooks)
+  (add-hook hook (lambda ()
+                   (setq show-paren-style 'expression)
+                   (paredit-mode)
+                   (rainbow-delimiters-mode))))
+#+END_SRC
+
+Show documentation when writing Emacs Lisp
+
+#+BEGIN_SRC emacs-lisp
+(use-package eldoc
+  :config
+  (add-hook 'emacs-lisp-mode-hook 'eldoc-mode))
 #+END_SRC
 
 * Resources
