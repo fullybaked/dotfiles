@@ -27,6 +27,13 @@ export FZF_DEFAULT_OPTS='
 # Always use ag
 alias grep='ag'
 
+# Emacs config for running zsh inside Emacs#multi-term
+if [ -n "$INSIDE_EMACS" ]; then
+  chpwd() { print -P "\033AnSiTc %d" }
+  print -P "\033AnSiTu %n"
+  print -P "\033AnSiTc %d"
+fi
+
 # Git aliases
 alias g="git"
 alias gst='git status'
@@ -98,9 +105,16 @@ compdef _deploy deploy
 export EDITOR=nvim
 alias o=$EDITOR
 
+# Add Homebrew keg only installs to the PATH
+export PATH="/usr/local/opt/postgresql@10/bin:$PATH"
+export PATH="/usr/local/opt/imagemagick@6/bin:$PATH"
+export PKG_CONFIG_PATH="/usr/local/opt/imagemagick@6/lib/pkgconfig"
+
 # Add Homebrew dirs to PATH
 export PATH=/usr/local/bin:/usr/local/sbin:$PATH
-export PATH=$HOME/bin:$PATH
+
+# Add my bin dir to $PATH
+export PATH=$HOME/.bin:$PATH
 
 # Rbenv config
 export PATH="$HOME/.rbenv/bin:$PATH"

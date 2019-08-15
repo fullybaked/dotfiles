@@ -12,6 +12,5 @@ let g:tagbar_autoclose = 1
 let g:tagbar_show_linenumbers = 1
 
 map <C-m> :TagbarToggle<CR>
-command! MakeTags !ctags -R .
 
 " vim:ft=vim

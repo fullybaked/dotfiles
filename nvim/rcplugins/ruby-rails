@@ -6,12 +6,31 @@ let g:ruby_indent_block_style = 'do'
 let g:ruby_indent_assignment_style = 'variable'
 
 call minpac#add('tpope/vim-rails')
+
+call minpac#add('tpope/vim-rbenv')
+
+call minpac#add('tpope/vim-rake')
+
+call minpac#add('tpope/vim-bundler')
+
 " Inline ruby execution using #=>
 call minpac#add('t9md/vim-ruby-xmpfilter')
+let g:xmpfilter_cmd = "seeing_is_believing"
+autocmd FileType ruby nmap <buffer> <Leader>r <Plug>(seeing_is_believing-mark)
+autocmd FileType ruby nmap <buffer> <Leader>R <Plug>(seeing_is_believing-run)
+autocmd FileType ruby nmap <buffer> <Leader>c <Plug>(seeing_is_believing-clean)
+
 " Better block level motions in Ruby
 call minpac#add('nelstrom/vim-textobj-rubyblock')
+
 " Jump to FactoryBot definitions
 call minpac#add('christoomey/vim-rfactory')
+
+" See https://www.youtube.com/watch?time_continue=1&v=kB2zSdVXT7k
+call minpac#add('AndrewRadev/sideways.vim')
+call minpac#add('AndrewRadev/splitjoin.vim')
+call minpac#add('AndrewRadev/tagalong.vim')
+call minpac#add('AndrewRadev/switch.vim')
 
 " Enable compiler support for ruby
 compiler ruby

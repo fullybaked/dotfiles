@@ -8,7 +8,7 @@ let g:VtrPercentage = 5
 nmap <silent> <C-e>o :VtrOpenRunner<cr>
 nmap <silent> <C-e>f :VtrFocusRunner<cr>
 nmap <silent> <C-e>a :VtrAttachToPane<cr>
-nmap <silent> <C-e>d :VtrDetachRunner<cr>
+nmap <silent> <C-e>d :VtrSendCtrlD<cr>
 nmap <silent> <C-e>c :VtrClearRunner<cr>
 vmap <silent> <C-e>c :VtrClearRunner<cr>
 nmap <silent> <C-e>x :VtrKillRunner<cr>

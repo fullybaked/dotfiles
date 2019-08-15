@@ -17,9 +17,10 @@ set nocompatible
 
 "  Leader must be set before any leader mappings as it is bound at runtime
 let mapleader = "\<Space>"
+let maplocalleader = ","
 
 "  Use minpac to manage packages, first have to install it manually
-" git clone https://github.com/k-takata/minpac.git ~/.config/nvim/pack/opt
+" git clone https://github.com/k-takata/minpac.git ~/.config/nvim/pack/minpac/opt/minpac
 packadd minpac
 call minpac#init()
 " let minpac manage its own updates

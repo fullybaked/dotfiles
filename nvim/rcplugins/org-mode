@@ -1,0 +1,20 @@
+" Attempt to recreate as much of Emacs Org mode here in Vim.  Mainly because Org mode is awesome,
+" but my workflow is so tied into Vim/Zsh/Tmux that I didn't stick with Emacs.
+"
+" https://github.com/jceb/vim-orgmode
+call minpac#add('jceb/vim-orgmode')
+
+" set up task keywords
+let g:org_todo_keywords = ['TODO(t)', 'WAIT(w)', '|', 'DONE(d)', 'CANCELLED(c)']
+let g:org_agenda_files = ['~/Desktop/tasks.org']
+
+" Enable changing of date values using Ctrl-a and Ctrl-x
+" https://github.com/tpope/vim-speeddating
+call minpac#add('tpope/vim-speeddating')
+
+" Calendar view for inserting timestamps into tasks/outlines. 
+" Could be useful to create the agenda view?
+" https://github.com/mattn/calendar-vim
+call minpac#add('mattn/calendar-vim')
+
+" vim:ft=vim
