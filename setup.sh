@@ -98,8 +98,11 @@ cask "alfred"
 cask "fantastical"
 cask "iterm2"
 cask "keyboard-maestro"
+cask "sketch"
 cask "slack"
+cask "soulver"
 cask "spotify"
+cask "transmit"
 cask "zoomus"
 EOF
 
