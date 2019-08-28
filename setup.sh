@@ -19,13 +19,25 @@ if [ ! -d "$HOME/.zsh" ]; then
   mkdir "$HOME/.zsh"
 fi
 
+if [ ! -d "$HOME/.emacs.d" ]; then
+  mkdir "$HOME/.emacs.d"
+fi
+
+ln -nsf $SCRIPTPATH/emacs/init.el $HOME/.emacs.d/init.el
+ln -nsf $SCRIPTPATH/emacs/readme.org $HOME/.emacs.d/readme.org
+ln -nsf $SCRIPTPATH/emacs/snippets $HOME/.emacs.d/snippets
+
+ln -nsf $SCRIPTPATH/nvim/init.vim $HOME/.config/nvim/init.vim
 ln -nsf $SCRIPTPATH/nvim/init.vim $HOME/.config/nvim/init.vim
 ln -nsf $SCRIPTPATH/nvim/rcfiles $HOME/.config/nvim/rcfiles
 ln -nsf $SCRIPTPATH/nvim/rcplugins $HOME/.config/nvim/rcplugins
+
 ln -nsf $SCRIPTPATH/git/gitignore $HOME/.gitignore
 ln -nsf $SCRIPTPATH/git/gitconfig $HOME/.gitconfig
+
 ln -nsf $SCRIPTPATH/tmux/tmux.conf $HOME/.tmux.conf
 ln -nsf $SCRIPTPATH/tmux/tat $HOME/.bin/
+
 ln -nsf $SCRIPTPATH/zsh/zshrc $HOME/.zshrc
 ln -nsf $SCRIPTPATH/zsh/fast-syntax-highlighting $HOME/.zsh/fast-syntax-highlighting
 
@@ -95,6 +107,8 @@ brew "elasticsearch@5.6"
 # from Cask - they have to be done manually
 
 cask "alfred"
+# I nearly always use Vim, but like Emacs for a GUI text editor when I need one
+cask "emacs"
 cask "fantastical"
 cask "iterm2"
 cask "keyboard-maestro"
