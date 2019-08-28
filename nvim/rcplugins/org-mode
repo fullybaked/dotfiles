@@ -6,7 +6,7 @@ call minpac#add('jceb/vim-orgmode')
 
 " set up task keywords
 let g:org_todo_keywords = ['TODO(t)', 'WAIT(w)', '|', 'DONE(d)', 'CANCELLED(c)']
-let g:org_agenda_files = ['~/Desktop/tasks.org']
+let g:org_agenda_files = ['~/Documents/tasks.org']
 
 " Enable changing of date values using Ctrl-a and Ctrl-x
 " https://github.com/tpope/vim-speeddating

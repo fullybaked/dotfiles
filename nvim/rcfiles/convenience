@@ -1,7 +1,7 @@
 " easier escaping from home row
 inoremap <silent> jj <Esc>
 
-nnoremap <C-c>t :vsplit ~/Desktop/tasks.org<CR>
+nnoremap <C-c>t :vsplit ~/Documents/tasks.org<CR>
 
 " bounce between two buffers
 nnoremap <leader><leader> <c-^>
