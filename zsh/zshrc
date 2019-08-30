@@ -50,7 +50,7 @@ alias gfu='git fudge'
 alias be='bundle exec'
 alias trails='RAILS_ENV=test rails'
 # normal rails server
-alias rs='PROD_IAGES=1 bundle exec rails server'
+alias rs='PROD_IMAGES=1 bundle exec rails server'
 # single thread server with production images
 alias rss='PROD_IMAGES=1 WEB_CONCURRENCY=1 bundle exec rails server'
 alias console='env DISABLE_SPRING=1 bin/rails console'
