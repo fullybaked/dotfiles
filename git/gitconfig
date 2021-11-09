@@ -1,0 +1,65 @@
+[core]
+  quotepath = false
+  editor = nvim
+  excludesfile = /Users/dave/.gitignore
+[user]
+	name = fullybaked
+	email = david@fullybaked.co.uk
+  trustExitCode = true
+[push]
+  default = current
+[color]
+  diff = auto
+  status = auto
+  branch = auto
+  interactive = auto
+  ui = true
+  pager = true
+[color "branch"]
+  current = yellow reverse
+  local   = yellow
+  remote  = green
+[color "diff"]
+  meta = blue
+  frag = magenta
+  old  = red
+  new  = green
+[color "status"]
+  added = yellow
+  changed = green
+  untracked = blue
+[alias]
+  aa = add --all
+  ap = add -p
+  br = branch
+  ci = commit
+  cm = commit -m
+  co = checkout
+  dc = diff --staged
+  freebase = !git co master && git fetch && git rebase origin/master && git co -
+  last = log -1 HEAD
+  lg =  log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all
+  nuke = !git co master && git br --merged | grep -v master | xargs -n 1 git br -d
+  st = status
+  undo = reset --soft HEAD~
+  unstage = reset HEAD --
+  fpush = push --force-with-lease
+  cst = !hub ci-status
+  fudge = commit --amend --no-edit
+  recent = for-each-ref --sort=-committerdate --count=10 --format='%(refname:short)' refs/heads/
+  prlog = "!f() { git log ${1:-develop}..HEAD --reverse --no-merges --pretty='---%n%n**%s** (%h)%n%n%b'; }; f"
+[branch]
+	autosetuprebase = always
+[help]
+  autocorrect = 1
+[commit]
+  verbose = true
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[pull]
+	rebase = true
+[init]
+	defaultBranch = main

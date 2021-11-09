@@ -1,0 +1,158 @@
+# Profiling - ucomment this and the last line in the file
+#zmodload zsh/zprof
+#
+# Use emacs keybindings on command line
+bindkey -e
+
+source ~/.zsh/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
+
+# Load zsh completions
+zstyle ':completion:*' menu select
+zstyle ':completion:*' completer _complete
+zstyle ':completion:*' matcher-list '' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' '+l:|=* r:|=*'
+
+autoload -Uz compinit
+for dump in ~/.zcompdump(N.mh+24); do
+  compinit
+done
+compinit -C
+
+# Load fzf bindings
+if [ -e /usr/local/opt/fzf/shell/completion.zsh ]; then
+  source /usr/local/opt/fzf/shell/key-bindings.zsh
+  source /usr/local/opt/fzf/shell/completion.zsh
+fi
+# Configure fzf and ag
+export FZF_DEFAULT_COMMAND='ag --nocolor -g ""'
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_ALT_C_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_DEFAULT_OPTS='
+--color fg:242,bg:236,hl:65,fg+:15,bg+:239,hl+:108
+--color info:108,prompt:109,spinner:108,pointer:168,marker:168
+'
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+# Always use ag
+alias grep='ag'
+
+# Git aliases
+alias g="git"
+alias gst='git status'
+alias gci='git commit --verbose'
+alias gap='git add -p'
+alias gaa='git add --all'
+alias gco='git checkout'
+alias gfp='git push --force-with-lease'
+alias gbr='git branch'
+alias gfu='git fudge'
+alias gpr='git pull --rebase'
+alias gdd='git diff'
+alias gds='git diff --staged'
+alias gun='git reset --soft HEAD~'
+alias gri='git rebase -i'
+alias gre='git rebase'
+alias grc='git rebase --continue'
+alias gra='git rebase --abort'
+alias gro='git fetch && git rebase origin/develop'
+alias gcl='git prlog | pbcopy'
+
+# Other misc aliases
+alias ll='ls -l'
+
+alias inv='inv -c invoke'
+
+alias gg='lazygit'
+
+alias av='aws-vault'
+
+# Set NeoVim up as default editor, shortcut to o
+# Pre-load the neovim3 virtual environment with the relevant python libs for nvim
+export EDITOR='nvim'
+alias o=$EDITOR
+
+# Add Homebrew dirs to PATH
+export PATH=/usr/local/bin:/usr/local/sbin:$PATH
+
+# Add my bin dir to $PATH
+export PATH=$HOME/.bin:$PATH
+
+# Rbenv config
+export PATH="$HOME/.rbenv/bin:$PATH"
+eval "$(rbenv init -)"
+
+
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+if command -v pyenv 1>/dev/null 2>&1; then
+  eval "$(pyenv init --path)"
+  eval "$(pyenv virtualenv-init -)"
+fi
+
+# Poetry (Python dependency manager)
+export PATH=$HOME/.poetry/bin:$PATH
+source $HOME/.poetry/env
+
+# NVM/Node config - wrapped in a function because I rarely need it
+# call `nvm` once to load then again to use
+nvm() {
+  export NVM_DIR="$HOME/.nvm"
+  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+}
+
+export PATH="${HOME}/.local/bin:${PATH}"
+eval "$(direnv hook zsh)"
+
+# History settings
+HISTFILE=$HOME/.zsh_history
+HISTSIZE=10000
+SAVEHIST=10000
+
+# if the entered text is not a command, and _is_ a directory, cd to that directory
+setopt auto_cd
+# make _cd_ push old dir onto stack
+setopt auto_pushd
+# don't push duplicate dirs onto stack
+setopt pushd_ignore_dups
+# always put cursor at the end if completion from within a word
+setopt always_to_end
+# store history from all sessions
+setopt append_history
+# turn off menu_complete (it overrides auto_menu if it's on)
+unsetopt menu_complete
+# use menu completion after 2nd request for competion
+setopt auto_menu
+# store timestamps and running times in the history file
+setopt extended_history
+# trim duplicates before unique commands from history first
+setopt hist_expire_dups_first
+# don't enter duplicates in history if they match previous event
+setopt hist_ignore_dups
+# don't auto-run history commands, put them in the buffer first
+setopt hist_verify
+# add commands to history file incrementally not at shell exit
+setopt inc_append_history
+# allow comments, even in interactive shells
+setopt interactive_comments
+
+# Get the current git branch and colourise it for the prompt
+# use lambda prompt if not in a git repo
+git_prompt() {
+  BRANCH=$(git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/*\(.*\)/\1/')
+
+  if [ ! -z $BRANCH ]; then
+    if [ ! -z "$(git status --short)" ]; then
+      echo -n "%F{yellow}($BRANCH %F{red}%B✘%b %F{yellow})\n"
+    else
+      echo -n "%F{yellow}($BRANCH %F{green}%B✔%b %F{yellow})\n"
+    fi
+  fi
+  echo -n "%B%(?.%F{green}√.%F{red}?%?) ➛%f%b "
+}
+# allow command substitution
+set -o PROMPT_SUBST
+# set the prompt
+PROMPT='%F{blue}%2~%f $(git_prompt) %f'
+
+source ~/.zshrc_local
+
+# Uncomment this to add profiling
+# zprof

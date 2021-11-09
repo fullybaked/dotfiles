@@ -1,0 +1,12 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhistcnt =8
+let g:netrw_dirhist_8='/Users/dave/Code/zapier/zapier/web/backend/zapier/app_platform/engine/dedupe/backends'
+let g:netrw_dirhist_7='/Users/dave/Code/zapier/zapier/web/backend/zapier/useful/tests/slack'
+let g:netrw_dirhist_6='/Users/dave/Code/zapier/zapier/web/backend/zapier/app_platform/engine'
+let g:netrw_dirhist_5='/Users/dave/Code/zapier/zapier/web/backend/zapier/app_platform/engine/tests'
+let g:netrw_dirhist_4='/Users/dave/Code/zapier/zapier/web/backend/zapier/app_platform/scheduler/management/commands'
+let g:netrw_dirhist_3='/Users/dave/Code/zapier/zapier/web/backend/zapier/app_platform/scheduler/management'
+let g:netrw_dirhist_2='/Users/dave/Code/zapier/zapier/web/backend/zapier/app_platform/scheduler'
+let g:netrw_dirhist_1='/Users/dave/Code/zapier/zapier/web/backend/zapier/workflow/flow'
+let g:netrw_dirhist_0='/Users/dave/Code/zapier/zapier/web/backend/zapier/app_platform/engine/utils'
+let g:netrw_dirhist_9='/Users/dave/Code/zapier/zapier/web/backend/zapier/app_platform/engine'
