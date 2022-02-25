@@ -9,4 +9,3 @@ tags.lock
 .notes
 .rubocop.yml
 make.sh
-invoke.py

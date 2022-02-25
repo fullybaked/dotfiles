@@ -42,6 +42,7 @@ call s:source_file('config/statusline.vim')
 call s:source_file('plugins/fzf.vim')
 call s:source_file('plugins/ale.vim')
 call s:source_file('plugins/vimtest.vim')
+" call s:source_file('plugins/lsp.vim')
 call s:source_file('plugins/startify.vim')
 
 " Layers are collections of plugins and settings for a given concept
@@ -54,8 +55,6 @@ call s:source_file('layers/tmux.vim')
 call s:source_file('layers/file-browsing.vim')
 call s:source_file('layers/tags.vim')
 call s:source_file('layers/zapier.vim')
-" call s:source_file('layers/ruby.vim')
-" call s:source_file('layers/elixir.vim')
 
 " Colour scheme is last to make sure other plugins don't mess with it
 call s:source_file('plugins/colorscheme.vim')

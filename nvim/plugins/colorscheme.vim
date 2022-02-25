@@ -12,6 +12,7 @@ Plug 'sainnhe/sonokai'
 Plug 'sainnhe/everforest'
 Plug 'sainnhe/gruvbox-material'
 Plug 'sainnhe/edge'
+Plug 'joshdick/onedark.vim'
 
 " Enable TrueColor
 let $NVIM_TUI_ENABLE_TRUE_COLOR=1

@@ -156,3 +156,6 @@ source ~/.zshrc_local
 
 # Uncomment this to add profiling
 # zprof
+[ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+export PATH="$HOME/.poetry/bin:$PATH"

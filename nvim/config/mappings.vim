@@ -5,8 +5,6 @@ let maplocalleader = ","
 
 " Easier escaping from home row
 inoremap <silent> jj <Esc>
-inoremap <silent> jk <Esc>
-inoremap <silent> kj <Esc>
 
 " Bounce between two buffers
 nnoremap <leader><leader> <c-^>
@@ -62,11 +60,8 @@ nmap <C-p> :bprev<cr>
 nmap <C-n> :bnext<cr>
 
 " Better tab keys
-nmap <Leader>to :tabnew<cr>
-nmap <Leader>te :tabedit %<cr>
-nmap <Leader>tc :tabclose<cr>
-nmap <Leader>tn :tabnext<cr>
-nmap <Leader>tp :tabprev<cr>
+nmap <A-tab> :tabnext<cr>
+nmap <S-Tab> :tabprev<cr>
 
 " Short cut to splits (\ is the | without a shift)
 nnoremap <silent> <Leader>\ :vsp<cr>
