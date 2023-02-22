@@ -5,6 +5,8 @@ set timeoutlen=500
 Plug 'liuchengxu/vim-which-key'
 nnoremap <silent> <Leader> :WhichKey '<Space>'<CR>
 
+nnoremap <silent> <Leader>j :%!jq '.'<CR>
+
 " Surrounding characters (ludicrously useful)
 Plug 'tpope/vim-surround'
 
@@ -59,3 +61,8 @@ Plug 'AndrewRadev/switch.vim'
 Plug 'vim-scripts/ReplaceWithRegister'
 
 Plug 'easymotion/vim-easymotion'
+
+if executable("rg")
+  set grepprg=rg\ --vimgrep\ --smart-case\ --hidden
+  set grepformat=%f:%l:%c:%m
+endif

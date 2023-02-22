@@ -36,7 +36,7 @@ Plug 'davidhalter/jedi-vim'
 let g:jedi#completions_enabled = 0
 let g:jedi#use_tabs_not_buffers = 1
 
-nnoremap <silent> <Leader>o :call jedi#usages()<cr>
+nnoremap <silent> <Leader>u :call jedi#usages()<cr>
 
 Plug 'fisadev/vim-isort'
 

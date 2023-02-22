@@ -9,10 +9,9 @@ set rtp+=~/.fzf
 
 let g:fzf_layout = { 'window': { 'width': 0.8, 'height': 0.5, 'highlight': 'Comment' } }
 
-map <C-f> :FZF<cr>
+map <C-f> :Files<cr>
 map <C-t> :Tags<cr>
 map <Leader>b :Buffers<cr>
-map <Leader>f :Files<cr>
 map <Leader>s :Ag<cr>
 
 function SearchWordUnderCursor()

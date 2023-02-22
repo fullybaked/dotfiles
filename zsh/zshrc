@@ -5,18 +5,6 @@
 bindkey -e
 
 source ~/.zsh/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
-
-# Load zsh completions
-zstyle ':completion:*' menu select
-zstyle ':completion:*' completer _complete
-zstyle ':completion:*' matcher-list '' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' '+l:|=* r:|=*'
-
-autoload -Uz compinit
-for dump in ~/.zcompdump(N.mh+24); do
-  compinit
-done
-compinit -C
-
 # Load fzf bindings
 if [ -e /usr/local/opt/fzf/shell/completion.zsh ]; then
   source /usr/local/opt/fzf/shell/key-bindings.zsh
@@ -57,12 +45,20 @@ alias gcl='git prlog | pbcopy'
 
 # Other misc aliases
 alias ll='ls -l'
+alias l='tree -L 1 | fzf | cd -'
 
 alias inv='inv -c invoke'
 
 alias gg='lazygit'
 
 alias av='aws-vault'
+
+alias tt="tmux attach -t"
+alias tl="tmux ls"
+
+alias por="poetry run"
+
+alias obs="cd /Users/dave/Library/Mobile Documents/iCloud~md~obsidian/Documents/"
 
 # Set NeoVim up as default editor, shortcut to o
 # Pre-load the neovim3 virtual environment with the relevant python libs for nvim
@@ -75,28 +71,8 @@ export PATH=/usr/local/bin:/usr/local/sbin:$PATH
 # Add my bin dir to $PATH
 export PATH=$HOME/.bin:$PATH
 
-# Rbenv config
-export PATH="$HOME/.rbenv/bin:$PATH"
-eval "$(rbenv init -)"
-
-
-export PYENV_ROOT="$HOME/.pyenv"
-export PATH="$PYENV_ROOT/bin:$PATH"
-if command -v pyenv 1>/dev/null 2>&1; then
-  eval "$(pyenv init --path)"
-  eval "$(pyenv virtualenv-init -)"
-fi
-
-# Poetry (Python dependency manager)
-export PATH=$HOME/.poetry/bin:$PATH
-source $HOME/.poetry/env
-
-# NVM/Node config - wrapped in a function because I rarely need it
-# call `nvm` once to load then again to use
-nvm() {
-  export NVM_DIR="$HOME/.nvm"
-  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
-}
+. $(brew --prefix asdf)/libexec/asdf.sh
+export FPATH="$(brew --prefix asdf)/libexec/completions:${FPATH}"
 
 export PATH="${HOME}/.local/bin:${PATH}"
 eval "$(direnv hook zsh)"
@@ -159,3 +135,16 @@ source ~/.zshrc_local
 [ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 export PATH="$HOME/.poetry/bin:$PATH"
+
+
+# Load zsh completions
+zstyle ':completion:*' menu select
+zstyle ':completion:*' completer _complete
+zstyle ':completion:*' matcher-list '' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' '+l:|=* r:|=*'
+
+autoload -Uz compinit
+for dump in ~/.zcompdump(N.mh+24); do
+  compinit
+done
+compinit -C
+

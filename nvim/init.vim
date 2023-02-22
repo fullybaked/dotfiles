@@ -62,4 +62,5 @@ call s:source_file('plugins/colorscheme.vim')
 " Close out the vim-plug scope
 call plug#end()
 " colorscheme has to be called outside of Plugin init
-colorscheme edge
+" colorscheme edge
+colorscheme gruvbox-material
